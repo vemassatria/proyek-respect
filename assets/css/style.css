@@ -580,6 +580,7 @@ body {
 }
 .event-card-banner img {
     width: 100%;
+    max-width: 500px;
     height: auto;
     display:flexbox;
 }
@@ -871,4 +872,92 @@ small { color: var(--text-light); }
     line-height: 1;
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* === FREE REGISTRATION PAGE STYLES === */
+.registration-container {
+    max-width: 700px;
+    margin: 2rem auto;
+    background-color: var(--white);
+    border-radius: 24px;
+    padding: 2.5rem;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+}
+
+.registration-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1.5rem;
+}
+
+.registration-header h2 {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.requirement-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Jarak antar item persyaratan */
+}
+
+.requirement-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    background-color: var(--background-light);
+    border: 1px solid var(--border-color);
+    padding: 1rem 1.5rem;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+}
+
+.requirement-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    border-color: var(--primary-color);
+}
+
+.requirement-icon {
+    flex-shrink: 0;
+}
+
+.requirement-icon img {
+    width: 28px;
+    height: 28px;
+    filter: opacity(0.6);
+}
+
+.requirement-info {
+    flex-grow: 1;
+}
+
+.requirement-info h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.requirement-info p {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin: 0;
+}
+
+.btn-upload-requirement {
+    background-color: #22c55e; /* Warna hijau cerah */
+    color: var(--white);
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    flex-shrink: 0;
+}
+
+.btn-upload-requirement:hover {
+    background-color: #16a34a; /* Warna hijau lebih gelap saat hover */
 }

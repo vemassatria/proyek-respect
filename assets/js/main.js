@@ -1,74 +1,39 @@
-// Menjalankan semua skrip setelah konten halaman (DOM) selesai dimuat.
 document.addEventListener("DOMContentLoaded", function() {
 
-    // --- FUNGSI UNTUK HALAMAN LOGIN & REGISTER ---
-    // Cek apakah elemen-elemen untuk form login/register ada di halaman ini.
-    const loginBtn = document.getElementById('login');
-    const registerBtn = document.getElementById('register');
-    const loginForm = document.querySelector('form.login');
-    const registerForm = document.querySelector('form.register');
+    // =================================================================
+    // MODUL 1: FUNGSI NAVIGASI UTAMA
+    // Mengelola pemuatan dan status aktif dari navigasi bawah.
+    // =================================================================
 
-    // Hanya jalankan kode ini jika elemen-elemen tersebut ditemukan.
-    if (loginBtn && registerBtn && loginForm && registerForm) {
-        // Event listener untuk tombol Login
-        loginBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // Mencegah link berpindah halaman
-            loginForm.style.left = '50%';
-            registerForm.style.left = '150%';
-            // Mengatur style tombol aktif/non-aktif
-            loginBtn.closest('.btn').classList.add('active');
-            registerBtn.closest('.btn').classList.remove('active');
-        });
-
-        // Event listener untuk tombol Register
-        registerBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // Mencegah link berpindah halaman
-            loginForm.style.left = '-50%';
-            registerForm.style.left = '50%';
-            // Mengatur style tombol aktif/non-aktif
-            registerBtn.closest('.btn').classList.add('active');
-            loginBtn.closest('.btn').classList.remove('active');
-        });
-    }
-
-
-    // --- FUNGSI UNTUK MEMUAT NAVBAR DI HALAMAN UTAMA ---
-    // Cek apakah ada placeholder untuk navbar di halaman ini.
     const navbarPlaceholder = document.getElementById('navbar-placeholder');
-    
-    // Hanya jalankan kode ini jika placeholder navbar ditemukan.
     if (navbarPlaceholder) {
-        // Fungsi untuk memuat dan menyisipkan navbar dari file eksternal
+        /**
+         * Memuat konten dari 'bottom-navbar.html' dan menyisipkannya ke dalam placeholder.
+         */
         function loadNavbar() {
-            fetch('bottom-navbar.html') // Mengambil konten dari bottom-navbar.html
+            fetch('bottom-navbar.html')
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Network response was not ok ' + response.statusText);
+                        throw new Error('Gagal memuat navbar: ' + response.statusText);
                     }
                     return response.text();
                 })
                 .then(data => {
-                    // Masukkan konten navbar ke dalam placeholder
                     navbarPlaceholder.innerHTML = data;
-                    // Setelah navbar dimuat, tandai link yang aktif
-                    setActiveNavLink();
+                    setActiveNavLink(); // Menandai link aktif setelah navbar dimuat
                 })
-                .catch(error => console.error('Error loading the navbar:', error));
+                .catch(error => console.error('Terjadi kesalahan:', error));
         }
 
-        // Fungsi untuk menandai link nav yang aktif sesuai halaman yang dibuka
+        /**
+         * Menandai link navigasi yang aktif berdasarkan halaman yang sedang dibuka.
+         */
         function setActiveNavLink() {
-            // Dapatkan nama file halaman saat ini (cth: "index.html")
-            const currentPage = window.location.pathname.split("/").pop();
-            
-            // Cari semua link di dalam navbar yang sudah dimuat
+            const currentPage = window.location.pathname.split("/").pop(); // Mendapatkan nama file (e.g., "index.html")
             const navLinks = document.querySelectorAll('#navbar-placeholder .nav-link');
             
             navLinks.forEach(link => {
-                const linkPage = link.getAttribute('href');
-                
-                // Jika href pada link sama dengan halaman saat ini, tambahkan kelas 'active'
-                if (linkPage === currentPage) {
+                if (link.getAttribute('href') === currentPage) {
                     link.classList.add('active');
                 }
             });
@@ -77,4 +42,54 @@ document.addEventListener("DOMContentLoaded", function() {
         // Panggil fungsi utama untuk memuat navbar
         loadNavbar();
     }
+
+
+    // =================================================================
+    // MODUL 2: FUNGSI AUTENTIKASI (LOGIN & REGISTER)
+    // Mengelola perpindahan halaman dan interaksi form.
+    // =================================================================
+
+    /**
+     * Fungsionalitas untuk tombol yang mengarahkan antar halaman.
+     * Contoh: Tombol "Masuk Akun" di halaman register akan mengarah ke login.html.
+     */
+    const goToLoginBtn = document.getElementById('goToLogin');
+    if (goToLoginBtn) {
+        goToLoginBtn.addEventListener('click', () => { window.location.href = 'login.html'; });
+    }
+
+    const goToRegisterBtn = document.getElementById('goToRegister');
+    if (goToRegisterBtn) {
+        goToRegisterBtn.addEventListener('click', () => { window.location.href = 'register.html'; });
+    }
+
+    /**
+     * Fungsionalitas untuk menampilkan dan menyembunyikan password,
+     * sekaligus mengubah ikon mata secara dinamis.
+     */
+    // Definisikan SVG untuk ikon mata terbuka dan tertutup
+    const eyeIconOpen = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const eyeIconSlashed = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><line x1="1" y1="1" x2="23" y2="23" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line></svg>`;
+
+    // Ambil semua tombol toggle password
+    const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+
+    // Beri fungsi pada setiap tombol
+    togglePasswordButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const passwordInput = this.previousElementSibling;
+            const isPasswordHidden = passwordInput.getAttribute('type') === 'password';
+
+            if (isPasswordHidden) {
+                // Jika password tersembunyi -> Tampilkan
+                passwordInput.setAttribute('type', 'text');
+                this.innerHTML = eyeIconSlashed; // Ubah ke ikon mata tertutup
+            } else {
+                // Jika password terlihat -> Sembunyikan
+                passwordInput.setAttribute('type', 'password');
+                this.innerHTML = eyeIconOpen; // Ubah ke ikon mata terbuka
+            }
+        });
+    });
+
 });
