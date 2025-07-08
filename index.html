@@ -3,43 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Respect.id</title>
+    <title>Home - Respect.id</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
     
     <main class="main-content">
-        <h1>Selamat Datang di Dashboard!</h1>
-        <p>Konten halaman utama akan kita buat di langkah selanjutnya.</p>
+        <header class="home-header">
+            <div class="header-text">
+                <h3>HAI ARIE!</h3>
+                <p>Rekomendasi untuk kamu</p>
+            </div>
+            <div class="header-icons">
+                <img src="assets/images/icon-add-header.svg" alt="Add">
+                <img src="assets/images/icon-idea.svg" alt="Idea">
+                <img src="assets/images/icon-cart.svg" alt="Cart">
+                <img src="assets/images/icon-notif.svg" alt="Notification">
+            </div>
+        </header>
+
+        <section class="event-list">
+            <div class="event-card">
+                <div class="event-card-banner">
+                    <img src="assets/images/event-banner.jpg" alt="Event Banner">
+                </div>
+                <div class="event-card-body">
+                    <h3>RESPECTIVE FEST 2025</h3>
+                    <p class="event-date">1 Januari 2025 - 31 Maret 2025</p>
+                    <div class="event-info-item">
+                        <p><strong>Masa Pendaftaran</strong></p>
+                        <p>1 Januari 2025 - 9 Maret 2025</p>
+                    </div>
+                    <div class="event-info-item">
+                        <p><strong>Biaya</strong></p>
+                        <p>Rp. 50.000 atau Gratis dengan syarat</p>
+                    </div>
+                     <div class="event-info-item">
+                        <p><strong>Baca Juknis</strong></p>
+                    </div>
+                </div>
+                <div class="event-card-footer">
+                    <span>12345 pendaftar</span>
+                    <a href="payment.html" class="btn-daftar">DAFTAR DI SINI</a>
+                </div>
+            </div>
+            </section>
     </main>
 
+    <div id="navbar-placeholder"></div>
 
-    <nav class="bottom-nav">
-    <a href="index.html" class="nav-link active">
-        <img src="assets/images/icon-home.svg" alt="Home">
-        <span>Home</span>
-    </a>
-
-    <a href="news.html" class="nav-link">
-        <img src="assets/images/icon-news.svg" alt="News">
-        <span>News</span>
-    </a>
-
-    <a href="transactions.html" class="nav-link">
-        <img src="assets/images/icon-add.svg" alt="Transaksi">
-        <span>Transaksi</span>
-    </a>
-
-    <a href="history.html" class="nav-link">
-        <img src="assets/images/icon-history.svg" alt="History">
-        <span>History</span>
-    </a>
-
-    <a href="account.html" class="nav-link">
-        <img src="assets/images/icon-account.svg" alt="Account">
-        <span>Account</span>
-    </a>
-</nav>
     <script src="assets/js/main.js"></script>
 </body>
 </html>
