@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Mengatur header agar output berupa JSON.
 header('Content-Type: application/json');
 
@@ -33,6 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Bandingkan password yang diinput pengguna dengan hash password di database.
         // Gunakan password_verify() untuk melakukan ini.
         if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_nama'] = $user['nama'];
             // Jika password cocok, kirim respon sukses beserta data pengguna.
             echo json_encode([
                 'status' => 'success', 

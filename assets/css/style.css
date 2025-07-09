@@ -796,6 +796,7 @@ small { color: var(--text-light); }
     padding: 1.5rem;
     background: #FFD6F5;
     border-top: 1px solid #fbcfe8;
+    z-index: 1000;
 }
 .btn-choice {
     flex: 1;
@@ -960,4 +961,23 @@ small { color: var(--text-light); }
 
 .btn-upload-requirement:hover {
     background-color: #16a34a; /* Warna hijau lebih gelap saat hover */
+}
+
+/* === LOGOUT BUTTON STYLE === */
+.btn-logout-custom {
+    background-color: #ef4444; /* Warna merah */
+    color: var(--white);
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 1.5rem;
+    width: 100%;
+    font-size: 1rem;
+}
+
+.btn-logout-custom:hover {
+    background-color: #dc2626;
 }
