@@ -157,42 +157,50 @@ document.addEventListener("DOMContentLoaded", function() {
     // Mengambil data dari API untuk ditampilkan di halaman.
     // =================================================================
 
-    // --- Memuat Daftar Kompetisi di Halaman Utama ---
-    const eventListContainer = document.getElementById('event-list-container');
-    if (eventListContainer) {
-        fetch('api/get_competitions.php')
-            .then(response => response.json())
-            .then(data => {
+    // --- Memuat Daftar Kompetisi di Halaman Utama (REVISI UNTUK LOOPING) ---
+const eventListContainer = document.getElementById('event-list-container');
+if (eventListContainer) {
+    fetch('api/get_competitions.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success' && data.data.length > 0) {
                 eventListContainer.innerHTML = ''; // Kosongkan container
-                if (data.status === 'success') {
-                    data.data.forEach(competition => {
-                        eventListContainer.innerHTML += `
-                            <div class="event-card">
-                                <div class="event-card-banner"><img src="assets/images/${competition.banner_img}" alt="Event Banner"></div>
-                                <div class="event-card-body">
-                                    <h3>${competition.nama_lomba}</h3>
-                                    <p class="event-date">${new Date(competition.tanggal_mulai_daftar).toLocaleDateString('id-ID')} - ${new Date(competition.tanggal_akhir_daftar).toLocaleDateString('id-ID')}</p>
-                                    <div class="event-info-item">
-                                        <p><strong>Biaya</strong></p>
-                                        <p>Rp. ${Number(competition.biaya).toLocaleString('id-ID')} atau Gratis</p>
-                                    </div>
-                                    <div class="event-info-item"><p><strong>Baca Juknis</strong></p></div>
+
+                // Fungsi untuk membuat HTML satu kartu
+                const createCardHTML = (competition) => {
+                    return `
+                        <div class="event-card">
+                            <div class="event-card-banner"><img src="assets/images/${competition.banner_img}" alt="Event Banner"></div>
+                            <div class="event-card-body">
+                                <h3>${competition.nama_lomba}</h3>
                                 </div>
-                                <div class="event-card-footer">
-                                    <span>Klik untuk mendaftar</span>
-                                    <a href="event-detail.html?id=${competition.id}" class="btn-daftar">DAFTAR DI SINI</a>
-                                </div>
-                            </div>`;
-                    });
-                } else {
-                    eventListContainer.innerHTML = `<p class="status-message">${data.message}</p>`;
-                }
-            })
-            .catch(error => {
-                console.error('Kesalahan memuat kompetisi:', error);
-                eventListContainer.innerHTML = `<p class="status-message">Gagal memuat data. Periksa koneksi Anda.</p>`;
-            });
-    }
+                            <div class="event-card-footer">
+                                <span>Klik untuk mendaftar</span>
+                                <a href="event-detail.html?id=${competition.id}" class="btn-daftar">DAFTAR DI SINI</a>
+                            </div>
+                        </div>`;
+                };
+
+                // Ambil data asli
+                const originalCards = data.data;
+
+                // Gabungkan data asli dengan duplikatnya untuk efek loop
+                const loopedCards = [...originalCards, ...originalCards];
+
+                // Tampilkan semua kartu (asli + duplikat)
+                loopedCards.forEach(competition => {
+                    eventListContainer.innerHTML += createCardHTML(competition);
+                });
+
+            } else {
+                eventListContainer.innerHTML = `<p class="status-message">${data.message}</p>`;
+            }
+        })
+        .catch(error => {
+            console.error('Kesalahan memuat kompetisi:', error);
+            eventListContainer.innerHTML = `<p class="status-message">Gagal memuat data. Periksa koneksi Anda.</p>`;
+        });
+}
 
     // --- Memuat Daftar Transaksi di Halaman Transaksi ---
     const transactionContainer = document.getElementById('transaction-list-container');
