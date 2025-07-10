@@ -19,8 +19,7 @@
             <header class="account-header">
                 <div class="account-greeting">
                     <h2>Halo, Selamat Datang</h2>
-                    <p id="account-name"></p>
-                    <span>Mahasiswa - Perguruan Tinggi</span>
+                    <p id="account-name">Memuat nama...</p>
                 </div>
                 <div class="profile-picture">
                     <img src="assets/images/icon-account-profile.svg" alt="Profile">
@@ -29,25 +28,54 @@
 
             <div class="divider"></div>
 
+            <form id="profile-form" class="profile-form">
+                <div class="form-group">
+                    <label for="tingkatan">Tingkatan</label>
+                    <select id="tingkatan" name="tingkatan" required>
+                        <option value="" disabled selected>Pilih tingkatan...</option>
+                        <option value="Siswa">Siswa</option>
+                        <option value="Mahasiswa">Mahasiswa</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="institusi">Asal Sekolah / Perguruan Tinggi</label>
+                    <input type="text" id="institusi" name="institusi" placeholder="Contoh: Universitas Brawijaya" required>
+                </div>
+                <button type="submit" class="btn-save-profile">Simpan Perubahan</button>
+            </form>
+
+            <div class="divider"></div>
+
             <section class="document-list">
+                <h3>Kelengkapan Dokumen</h3>
                 <div class="document-row">
-                    <div class="document-icon">
-                        <img src="assets/images/icon-document.svg" alt="Document">
-                    </div>
                     <div class="document-info">
-                        <h3>PORTOFOLIO</h3>
+                        <h3>CV (Curriculum Vitae)</h3>
                         <p>Dokumen belum diupload</p>
                     </div>
-                    <button class="btn-upload">Upload file</button>
-                    <div> <button id="logout-button" class="btn-logout-custom">Logout</button></div>
-                   
+                    <button class="btn-upload" data-doctype="cv">Upload</button>
                 </div>
-                </section>
+                <div class="document-row">
+                    <div class="document-info">
+                        <h3>Portofolio</h3>
+                        <p>Dokumen belum diupload</p>
+                    </div>
+                    <button class="btn-upload" data-doctype="portfolio">Upload</button>
+                </div>
+                <div class="document-row">
+                    <div class="document-info">
+                        <h3>KTM / Kartu Pelajar</h3>
+                        <p>Dokumen belum diupload</p>
+                    </div>
+                    <button class="btn-upload" data-doctype="ktm">Upload</button>
+                </div>
+            </section>
+
+             <button id="logout-button" class="btn-logout-custom">Logout</button>
         </div>
     </main>
 
     <div id="navbar-placeholder"></div>
-
     <script src="assets/js/main.js"></script>
 </body>
 </html>

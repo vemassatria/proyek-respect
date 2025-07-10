@@ -6,43 +6,22 @@
     <title>Detail Event - Respect.id</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body class="bg-pink">
-    <main class="main-content-flow">
+<body class="bg-pink-gradient"> <main class="main-content-flow">
         <a href="index.html" class="back-button-corner">
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M19 12H5M12 19L5 12L12 5" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M19 12H5M12 19L5 12L12 5" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </a>
 
-        <div class="event-detail-container">
-            <header class="event-detail-header">
-                <div class="user-icon">
-                    <img src="assets/images/icon-account-profile.svg" alt="User">
-                </div>
-                <div class="user-info">
-                    <h2>Mochamad Saiful Anwar</h2>
-                    <p>Pendaftaran Event Respective Fest 2025</p>
-                </div>
+        <div class="competition-detail-container" id="competition-detail-content">
+            <header class="competition-header">
+                <h2 id="competition-title">Memuat nama lomba...</h2>
+                <p id="competition-description"></p>
+                <img id="competition-banner" src="" alt="Banner Lomba" style="width: 100%; border-radius: 16px; margin-top: 1rem;">
             </header>
 
-            <section class="competition-list">
-                <div class="competition-item">
-                    <h3>Olimpiade Akuntansi Mahasiswa - Perguruan Tinggi</h3>
-                    <p>Minggu, 27 Oktober 2025</p>
-                    <p>08.00 - 13.00</p>
-                </div>
-
-                <div class="competition-item">
-                    <h3>Olimpiade Akuntansi Mahasiswa - Perguruan Tinggi</h3>
-                    <p>Minggu, 27 Oktober 2025</p>
-                    <p>08.00 - 13.00</p>
-                </div>
-                 <div class="competition-item">
-                    <h3>Olimpiade Akuntansi Mahasiswa - Perguruan Tinggi</h3>
-                    <p>Minggu, 27 Oktober 2025</p>
-                    <p>08.00 - 13.00</p>
-                </div>
-            </section>
+            <section class="details-section" id="details-container">
+                </section>
         </div>
     </main>
 
@@ -50,6 +29,7 @@
         <button id="btn-gratis" class="btn-choice gratis">Gratis</button>
         <button id="btn-berbayar" class="btn-choice berbayar">Berbayar</button>
     </footer>
+
     <script src="assets/js/main.js"></script>
 </body>
 </html>
