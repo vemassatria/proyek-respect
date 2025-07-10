@@ -5,6 +5,27 @@
 document.addEventListener("DOMContentLoaded", function() {
 
     // =================================================================
+    // MODUL 0: PROTEKSI HALAMAN (ROUTE PROTECTION) - KODE BARU
+    // =================================================================
+    
+    // Ambil data pengguna dari LocalStorage.
+    const user = JSON.parse(localStorage.getItem('user'));
+    
+    // Ambil nama file halaman saat ini (misal: "index.html").
+    const currentPage = window.location.pathname.split("/").pop();
+    
+    // Daftar halaman yang Boleh diakses TANPA login.
+    const publicPages = ['login.html', 'register.html'];
+
+    // Cek kondisi:
+    // Jika TIDAK ada data user (belum login) DAN halaman saat ini BUKAN halaman publik.
+    if (!user && !publicPages.includes(currentPage)) {
+        // Peringatkan pengguna dan usir kembali ke halaman login.
+        alert("Anda harus login terlebih dahulu untuk mengakses halaman ini.");
+        window.location.href = 'login.html';
+    }
+    
+    // =================================================================
     // MODUL 1: MANAJEMEN DATA PENGGUNA (LocalStorage)
     // Mengelola data pengguna yang login dan memperbarui UI.
     // =================================================================
@@ -218,42 +239,178 @@ document.addEventListener("DOMContentLoaded", function() {
     // =================================================================
     // MODUL 5: FUNGSI HALAMAN DETAIL & PENDAFTARAN LOMBA
     // =================================================================
-    const btnGratis = document.getElementById('btn-gratis');
+     const btnGratis = document.getElementById('btn-gratis');
     const btnBerbayar = document.getElementById('btn-berbayar');
+
     if (btnGratis && btnBerbayar) {
+        // Ambil ID kompetisi dari URL untuk diteruskan ke halaman selanjutnya
         const urlParams = new URLSearchParams(window.location.search);
         const competitionId = urlParams.get('id');
-        const user = JSON.parse(localStorage.getItem('user'));
 
-        function registerToCompetition() {
-            if (!user) {
-                alert("Anda harus login terlebih dahulu untuk mendaftar.");
-                window.location.href = 'login.html';
-                return;
+        // Jika tombol 'Gratis' diklik, arahkan ke halaman pendaftaran gratis
+        btnGratis.addEventListener('click', function() {
+            if (competitionId) {
+                window.location.href = `free-registration.html?id=${competitionId}`;
+            } else {
+                alert("ID Kompetisi tidak ditemukan!");
             }
-            if (!competitionId) {
-                alert("ID Kompetisi tidak ditemukan. Kembali ke halaman utama.");
-                window.location.href = 'index.html';
-                return;
-            }
+        });
 
-            const formData = new FormData();
-            formData.append('user_id', user.id);
-            formData.append('competition_id', competitionId);
-            
-            fetch('api/register_competition.php', { method: 'POST', body: formData })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    if (data.status === 'success') {
-                        window.location.href = 'transactions.html';
-                    }
-                })
-                .catch(error => console.error('Kesalahan Pendaftaran Lomba:', error));
+        // Jika tombol 'Berbayar' diklik, arahkan ke halaman pembayaran
+        btnBerbayar.addEventListener('click', function() {
+            if (competitionId) {
+                window.location.href = `payment.html?id=${competitionId}`;
+            } else {
+                alert("ID Kompetisi tidak ditemukan!");
+            }
+        });
+    }
+    // MODUL 6: FUNGSI HALAMAN PEMBAYARAN (CHECKOUT) - KODE DIPERBARUI
+    // =================================================================
+    const paymentContainer = document.getElementById('payment-container');
+    if (paymentContainer) {
+        
+        const competitionItemsContainer = document.getElementById('competition-items-container');
+        const merchandiseContainer = document.getElementById('merchandise-items-container');
+        const totalCostElement = document.getElementById('total-cost');
+        const checkoutButton = document.getElementById('process-checkout-btn');
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const competitionId = urlParams.get('id');
+
+        let cart = [];
+
+        function updateTotal() {
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+            });
+            totalCostElement.textContent = `Rp ${total.toLocaleString('id-ID')}`;
         }
 
-        btnGratis.addEventListener('click', registerToCompetition);
-        btnBerbayar.addEventListener('click', registerToCompetition);
-    }
+        function loadPaymentOptions() {
+            if (!competitionId) {
+                alert("ID Kompetisi tidak ditemukan.");
+                return;
+            }
 
+            fetch(`api/get_payment_options.php?id=${competitionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // --- PERUBAHAN DI SINI ---
+                        // Tampilkan item kompetisi dengan input di dalam label
+                        data.data.competition_items.forEach(item => {
+                            competitionItemsContainer.innerHTML += `
+                                <div class="checkout-item">
+                                    <label class="checkout-label">
+                                        <input type="checkbox" class="checkout-checkbox" data-id="${item.id}" data-name="${item.item_name}" data-price="${item.price}" data-type="competition">
+                                        ${item.item_name}
+                                    </label>
+                                    <span>Rp ${Number(item.price).toLocaleString('id-ID')}</span>
+                                </div>`;
+                        });
+
+                        // Tampilkan item merchandise (tidak berubah)
+                        data.data.merchandise.forEach(item => {
+                            merchandiseContainer.innerHTML += `
+                                <div class="checkout-item merchandise">
+                                    <div class="item-info">
+                                        <p>${item.item_name}</p>
+                                        <span>Rp ${Number(item.price).toLocaleString('id-ID')}</span>
+                                    </div>
+                                    <div class="quantity-stepper">
+                                        <button class="stepper-btn minus" data-id="${item.id}" data-name="${item.item_name}" data-price="${item.price}" data-type="merchandise">-</button>
+                                        <span id="quantity-${item.id}">0</span>
+                                        <button class="stepper-btn plus" data-id="${item.id}" data-name="${item.item_name}" data-price="${item.price}" data-type="merchandise">+</button>
+                                    </div>
+                                </div>`;
+                        });
+                        
+                        addEventListenersToItems();
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function addEventListenersToItems() {
+            document.querySelectorAll('.checkout-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const itemData = this.dataset;
+                    const itemId = parseInt(itemData.id);
+                    
+                    if (this.checked) {
+                        cart.push({ id: itemId, name: itemData.name, price: parseFloat(itemData.price), quantity: 1, type: itemData.type });
+                    } else {
+                        cart = cart.filter(cartItem => !(cartItem.id === itemId && cartItem.type === 'competition'));
+                    }
+                    updateTotal();
+                });
+            });
+
+            document.querySelectorAll('.stepper-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const itemData = this.dataset;
+                    const itemId = parseInt(itemData.id);
+                    let itemInCart = cart.find(cartItem => cartItem.id === itemId && cartItem.type === 'merchandise');
+
+                    if (this.classList.contains('plus')) {
+                        if (itemInCart) {
+                            itemInCart.quantity++;
+                        } else {
+                            cart.push({ id: itemId, name: itemData.name, price: parseFloat(itemData.price), quantity: 1, type: itemData.type });
+                        }
+                    } else if (this.classList.contains('minus')) {
+                        if (itemInCart && itemInCart.quantity > 0) {
+                            itemInCart.quantity--;
+                        }
+                    }
+                    
+                    cart = cart.filter(cartItem => cartItem.quantity > 0);
+                    
+                    const quantityElement = document.getElementById(`quantity-${itemId}`);
+                    if (quantityElement) {
+                        const updatedItem = cart.find(cartItem => cartItem.id === itemId && cartItem.type === 'merchandise');
+                        quantityElement.textContent = updatedItem ? updatedItem.quantity : 0;
+                    }
+                    
+                    updateTotal();
+                });
+            });
+        }
+        
+        checkoutButton.addEventListener('click', function() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user) {
+                alert("Silakan login terlebih dahulu.");
+                return;
+            }
+            if (cart.length === 0) {
+                alert("Keranjang Anda kosong. Silakan pilih item terlebih dahulu.");
+                return;
+            }
+
+            const checkoutData = {
+                competition_id: competitionId,
+                user_id: user.id,
+                items: cart
+            };
+
+            fetch('api/process_checkout.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(checkoutData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.status === 'success') {
+                    window.location.href = 'transactions.html';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        loadPaymentOptions();
+    }
 });
