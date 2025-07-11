@@ -125,67 +125,82 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // =================================================================
+     // =================================================================
     // MODUL 4: PEMUATAN DATA DINAMIS
     // =================================================================
 
-    // --- Memuat Daftar Kompetisi (REVISI UNTUK INFINITE SCROLL MANUAL) ---
-     const eventListWrapper = document.querySelector('.event-list-wrapper');
+    // --- Memuat Daftar Kompetisi (REVISI UNTUK MENAMPILKAN DETAIL KARTU) ---
+    const eventListWrapper = document.querySelector('.event-list-wrapper');
     if (eventListWrapper) {
         const eventListContainer = document.getElementById('event-list-container');
-        let isThrottled = false; // Flag untuk throttling
+        let isScrolling;
 
         fetch('api/get_competitions.php')
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success' && data.data.length > 0) {
-                    // Tampilkan kartu awal HANYA SATU KALI
-                    data.data.forEach(competition => {
-                        eventListContainer.innerHTML += `
+                    
+                    // --- PERUBAHAN UTAMA DI FUNGSI INI ---
+                    // Fungsi untuk membuat HTML satu kartu dengan detail lengkap
+                    const createCardHTML = (competition) => {
+                        // Format tanggal agar lebih mudah dibaca
+                        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                        const startDate = new Date(competition.tanggal_mulai_daftar).toLocaleDateString('id-ID', options);
+                        const endDate = new Date(competition.tanggal_akhir_daftar).toLocaleDateString('id-ID', options);
+
+                        // Potong deskripsi jika terlalu panjang
+                        const shortDescription = competition.deskripsi.length > 100 
+                            ? competition.deskripsi.substring(0, 100) + '...' 
+                            : competition.deskripsi;
+
+                        return `
                             <div class="event-card">
-                                <div class="event-card-banner"><img src="assets/images/${competition.banner_img}" alt="Banner"></div>
+                                <div class="event-card-banner">
+                                    <img src="assets/images/${competition.banner_img}" alt="${competition.nama_lomba}">
+                                </div>
                                 <div class="event-card-body">
                                     <h3>${competition.nama_lomba}</h3>
-                                    <p class="event-date">${new Date(competition.tanggal_mulai_daftar).toLocaleDateString('id-ID')}</p>
-                                    <div class="event-info-item"><p><strong>Biaya</strong></p><p>Rp. ${Number(competition.biaya).toLocaleString('id-ID')}</p></div>
-                                    <div class="event-info-item"><p><strong>Baca Juknis</strong></p></div>
+                                    <p class="event-description">${shortDescription}</p>
+                                    <div class="event-info-item">
+                                        <p><strong>Pendaftaran</strong></p>
+                                        <p>${startDate} - ${endDate}</p>
+                                    </div>
+                                    <div class="event-info-item">
+                                        <p><strong>Biaya</strong></p>
+                                        <p>Rp. ${Number(competition.biaya).toLocaleString('id-ID')} atau Gratis</p>
+                                    </div>
+                                    <div class="event-info-item">
+                                        <p><strong>Baca Juknis</strong></p>
+                                    </div>
                                 </div>
                                 <div class="event-card-footer">
                                     <span>Klik untuk mendaftar</span>
                                     <a href="event-detail.html?id=${competition.id}" class="btn-daftar">DAFTAR</a>
                                 </div>
                             </div>`;
+                    };
+
+                    // Hapus konten lama dan isi dengan kartu baru
+                    eventListContainer.innerHTML = '';
+                    data.data.forEach(competition => {
+                        eventListContainer.innerHTML += createCardHTML(competition);
                     });
 
-                    // Gandakan semua kartu yang ada SATU KALI untuk buffer
-                    // Ini diperlukan agar ada 'ruang' saat teleportasi
+                    // Gandakan kartu untuk efek infinite scroll
                     eventListContainer.innerHTML += eventListContainer.innerHTML;
 
+                    // Logika infinite scroll (tidak berubah)
                     function handleInfiniteScroll() {
-                        // Mencegah fungsi berjalan terlalu sering (throttling)
-                        if (isThrottled) return;
-                        isThrottled = true;
-
-                        // Gunakan requestAnimationFrame untuk sinkronisasi dengan browser
-                        requestAnimationFrame(() => {
-                            const maxScrollLeft = eventListContainer.scrollWidth - eventListWrapper.clientWidth;
-                            
-                            // Jika scroll sampai ke ujung kanan
+                        if (window.clearTimeout(isScrolling)) { /* ... */ }
+                        isScrolling = setTimeout(function() {
+                            const maxScrollLeft = eventListContainer.scrollWidth - eventListContainer.clientWidth;
                             if (eventListWrapper.scrollLeft >= maxScrollLeft - 1) {
-                                // Pindahkan posisi scroll ke sepertiga awal secara diam-diam
-                                eventListWrapper.scrollLeft = maxScrollLeft / 2 - 1;
+                                eventListWrapper.scrollLeft = 1;
+                            } else if (eventListWrapper.scrollLeft <= 0) {
+                                eventListWrapper.scrollLeft = maxScrollLeft - 2;
                             }
-                            // Jika scroll sampai ke ujung kiri
-                            else if (eventListWrapper.scrollLeft <= 0) {
-                                // Pindahkan posisi scroll ke sepertiga akhir secara diam-diam
-                                eventListWrapper.scrollLeft = maxScrollLeft / 2 + 1;
-                            }
-                            
-                            isThrottled = false; // Izinkan pengecekan lagi
-                        });
+                        }, 66);
                     }
-
-                    // Tambahkan event listener ke wrapper
                     eventListWrapper.addEventListener('scroll', handleInfiniteScroll);
 
                 } else {
@@ -231,7 +246,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // =================================================================
-    // MODUL 5: FUNGSI HALAMAN DETAIL & PENDAFTARAN LOMBA
+    // MODUL 5: FUNGSI HALAMAN DETAIL LOMBA (DIROMBAK TOTAL)
     // =================================================================
     const competitionDetailContainer = document.getElementById('competition-detail-content');
     if (competitionDetailContainer) {
@@ -239,41 +254,52 @@ document.addEventListener("DOMContentLoaded", function() {
         const urlParams = new URLSearchParams(window.location.search);
         const competitionId = urlParams.get('id');
 
+        // Pastikan ada ID di URL sebelum melakukan fetch
         if (competitionId) {
-            // Panggil API untuk mengambil detail
-            fetch(`api/get_competition_detail.php?id=${competitionId}`)
+            fetch(`api/get_competitions_detail.php?id=${competitionId}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
                         const competition = data.data;
 
-                        // Isi data utama
+                        // Isi elemen-elemen di halaman dengan data dari API
                         document.getElementById('competition-title').textContent = competition.nama_lomba;
                         document.getElementById('competition-description').textContent = competition.deskripsi;
                         document.getElementById('competition-banner').src = `assets/images/${competition.banner_img}`;
 
                         // Isi bagian detail (juknis, timeline, dll)
                         const detailsContainer = document.getElementById('details-container');
-                        detailsContainer.innerHTML = ''; // Kosongkan dulu
-                        competition.details.forEach(detail => {
-                            detailsContainer.innerHTML += `
-                                <div class="detail-item">
-                                    <h3>${detail.detail_title}</h3>
-                                    <p>${detail.detail_content}</p>
-                                </div>
-                            `;
-                        });
+                        detailsContainer.innerHTML = ''; // Kosongkan dulu untuk mencegah duplikasi
+
+                        if (competition.details && competition.details.length > 0) {
+                            competition.details.forEach(detail => {
+                                detailsContainer.innerHTML += `
+                                    <div class="detail-item">
+                                        <h3>${detail.detail_title}</h3>
+                                        <p>${detail.detail_content}</p>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            detailsContainer.innerHTML = "<p>Informasi detail untuk lomba ini belum tersedia.</p>";
+                        }
                     } else {
-                        alert(data.message);
+                        // Jika API mengembalikan error (misal: lomba tidak ditemukan)
+                        competitionDetailContainer.innerHTML = `<p>${data.message}</p>`;
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error memuat detail kompetisi:', error);
+                    competitionDetailContainer.innerHTML = "<p>Terjadi kesalahan saat memuat data.</p>";
+                });
+        } else {
+            competitionDetailContainer.innerHTML = "<h1>ID Lomba tidak ditemukan.</h1>";
         }
         
-        // Logika untuk tombol Gratis & Berbayar
+        // --- Event listener untuk tombol Gratis & Berbayar ---
         const btnGratis = document.getElementById('btn-gratis');
         const btnBerbayar = document.getElementById('btn-berbayar');
-        if(btnGratis && btnBerbayar) {
+        if (btnGratis && btnBerbayar) {
              btnGratis.addEventListener('click', () => { if(competitionId) window.location.href = `free-registration.html?id=${competitionId}`; });
              btnBerbayar.addEventListener('click', () => { if(competitionId) window.location.href = `payment.html?id=${competitionId}`; });
         }
@@ -512,5 +538,65 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+    // =================================================================
+    // MODUL 8: FUNGSI HALAMAN NEWS (PERIKSA BAGIAN INI)
+    // =================================================================
+    const featuredNewsContainer = document.getElementById('featured-news-container');
+    if (featuredNewsContainer) {
+        const articlesLeftContainer = document.getElementById('organizational-articles-left');
+        const articlesRightContainer = document.getElementById('organizational-articles-right');
 
+        fetch('api/get_news.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // --- Fungsi untuk menentukan path gambar ---
+                    function getImagePath(imageUrl) {
+                        // Cek jika imageUrl adalah link eksternal
+                        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+                            return imageUrl; // Gunakan link apa adanya
+                        } else {
+                            // Jika bukan, anggap ini file lokal
+                            return `assets/images/${imageUrl}`;
+                        }
+                    }
+                    
+                      // Tampilkan Berita Utama (Featured News)
+                    const featuredNews = data.data.featured_news;
+                    featuredNewsContainer.innerHTML = ''; 
+                    featuredNews.forEach(news => {
+                        const imagePath = getImagePath(news.image_url);
+                        featuredNewsContainer.innerHTML += `
+                            <a href="${news.article_link}" target="_blank" class="featured-card" style="background-image: url('${imagePath}')">
+                                <p class="news-title">${news.title}</p>
+                            </a>`;
+                    });
+
+                    // --- BAGIAN PENTING 2: ARTIKEL ORGANISASI ---
+                    const orgArticles = data.data.organizational_articles;
+                    articlesLeftContainer.innerHTML = ''; 
+                    articlesRightContainer.innerHTML = ''; 
+
+                    const middleIndex = Math.ceil(orgArticles.length / 2);
+                    orgArticles.forEach((article, index) => {
+                        const shortDescription = article.article_link;
+                        
+                        // Pastikan ada 'target="_blank"' di sini juga
+                        const articleHTML = `
+                            <div class="article-item-text-only">
+                                <a href="${article.article_link}" target="_blank" class="article-link-wrapper">
+                                    <h4 class="article-title">${article.title}</h4>
+                                    <p class="article-description">${shortDescription}</p>
+                                </a>
+                            </div>`;
+
+                        if (index < middleIndex) {
+                            articlesLeftContainer.innerHTML += articleHTML;
+                        } else {
+                            articlesRightContainer.innerHTML += articleHTML;
+                        }
+                    });
+                }
+            });
+    }
 });

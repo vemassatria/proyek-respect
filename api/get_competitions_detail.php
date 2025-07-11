@@ -9,7 +9,7 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 }
 
 $competition_id = intval($_GET['id']);
-$response_data = null; // Variabel untuk menampung hasil akhir
+$response_data = null;
 
 // --- 1. Mengambil Data Utama Kompetisi ---
 $stmt_main = $conn->prepare("SELECT id, nama_lomba, deskripsi, tanggal_mulai_daftar, tanggal_akhir_daftar, biaya, banner_img FROM competitions WHERE id = ?");
@@ -22,7 +22,6 @@ if ($result_main->num_rows === 1) {
     $response_data = $result_main->fetch_assoc();
     
     // --- 2. Mengambil Detail-Detail Lomba ---
-    // Siapkan array kosong untuk menampung detailnya.
     $response_data['details'] = []; 
     
     $stmt_details = $conn->prepare("SELECT detail_title, detail_content FROM competition_details WHERE competition_id = ? ORDER BY id ASC");
@@ -31,7 +30,6 @@ if ($result_main->num_rows === 1) {
     $result_details = $stmt_details->get_result();
     
     if ($result_details->num_rows > 0) {
-        // Jika ada detail, masukkan semuanya ke dalam array 'details'.
         while($row = $result_details->fetch_assoc()) {
             $response_data['details'][] = $row;
         }
@@ -43,7 +41,7 @@ if ($result_main->num_rows === 1) {
 
 } else {
     // Jika data utama dengan ID tersebut tidak ditemukan.
-    echo json_encode(['status' => 'error', 'message' => 'Kompetisi tidak ditemukan.']);
+    echo json_encode(['status' => 'error', 'message' => 'Kompetisi dengan ID ' . $competition_id . ' tidak ditemukan.']);
 }
 
 $stmt_main->close();

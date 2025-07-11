@@ -615,6 +615,7 @@ body {
     max-width: 900px;
     padding: 1rem;
     margin-bottom: 1rem;
+    height: 1vh;
 }
 
 .home-header .header-text h3 { font-size: 1.5rem; margin: 0; }
@@ -1169,3 +1170,156 @@ small { color: var(--text-light); }
     transition: background-color 0.3s ease;
 }
 .btn-checkout:hover { background: var(--primary-hover); }
+
+/* === NEWS PAGE - TEXT-ONLY ARTICLE STYLES === */
+#organizational-articles-container {
+    margin-top: 2rem;
+    width: 100%;
+    max-width: 1200px;
+}
+
+#organizational-articles-container h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-dark);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+.article-item-text-only {
+    margin-bottom: 1.5rem;
+}
+
+.article-link-wrapper {
+    text-decoration: none;
+    display: block;
+}
+
+.article-link-wrapper .article-title {
+    font-size: 1.25rem;
+    color: var(--primary-color);
+    margin: 0 0 0.25rem 0;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.article-link-wrapper:hover .article-title {
+    text-decoration: underline;
+}
+
+.article-link-wrapper .article-description {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* === NEWS PAGE LAYOUT STYLES === */
+
+/* Container Putih untuk Setiap Bagian */
+.news-section,
+.articles-section {
+    background-color: var(--white);
+    padding: 1.5rem 2rem;
+    border-radius: 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Judul Bagian (Berita Terkini, Artikel Organisasi) */
+.news-section h2,
+.articles-section h2 {
+    font-size: 1.6rem;
+    color: var(--text-dark);
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+/* Wrapper untuk Berita Utama (Horizontal Scroll) */
+.featured-news-wrapper {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto; /* Mengaktifkan scroll horizontal */
+    padding-bottom: 1.5rem; /* Memberi ruang untuk scrollbar */
+    -ms-overflow-style: none;  /* Sembunyikan scrollbar di IE/Edge */
+    scrollbar-width: none;  /* Sembunyikan scrollbar di Firefox */
+}
+.featured-news-wrapper::-webkit-scrollbar {
+    display: none; /* Sembunyikan scrollbar di Chrome/Safari */
+}
+
+/* Kartu Berita Utama */
+.featured-card {
+    flex: 0 0 320px; /* Lebar kartu tetap, tidak menyusut */
+    height: 180px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end; /* Teks berada di bawah */
+    padding: 1rem;
+    color: var(--white);
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+.featured-card:hover {
+    transform: translateY(-5px);
+}
+/* Overlay gelap agar teks mudah dibaca */
+.featured-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+}
+.featured-card .news-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    position: relative;
+    z-index: 2;
+}
+
+/* Container untuk Artikel Organisasi (Dua Kolom) */
+.articles-container {
+    display: flex;
+    gap: 2rem;
+}
+.article-column {
+    flex: 1; /* Setiap kolom mengambil 50% lebar */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Item Artikel (Teks Saja) */
+.article-item-text-only {
+    background-color: var(--background-light);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+.article-link-wrapper {
+    text-decoration: none;
+}
+.article-link-wrapper .article-title {
+    font-size: 1.1rem;
+    color: var(--primary-color);
+    margin: 0 0 0.25rem 0;
+    font-weight: 600;
+}
+.article-link-wrapper:hover .article-title {
+    text-decoration: underline;
+}
+.article-link-wrapper .article-description {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    margin: 0;
+    line-height: 1.5;
+}
