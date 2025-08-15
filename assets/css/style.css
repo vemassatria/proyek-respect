@@ -1323,3 +1323,119 @@ small { color: var(--text-light); }
     margin: 0;
     line-height: 1.5;
 }
+
+/* === FREE REGISTRATION PAGE STYLES === */
+.file-input-requirement { /* Style untuk input file */
+    flex-shrink: 0;
+}
+.btn-submit-requirement { /* Style untuk tombol submit */
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 1rem;
+    width: 100%;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 2rem;
+    transition: background-color 0.3s ease;
+}
+.btn-submit-requirement:hover {
+    background-color: var(--primary-hover);
+}
+
+/* Style untuk nama file yang sudah di-upload */
+.status-uploaded .uploaded-file-name {
+    display: inline-block;
+    background-color: #eef2ff; /* Warna latar belakang lembut */
+    color: #4338ca; /* Warna teks */
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px; /* Membuatnya seperti pil */
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: 1px solid #c7d2fe;
+}
+
+/* === PAYMENT POPUP (MODAL) STYLES === */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease-in-out;
+}
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+.modal-content {
+    background: var(--white);
+    padding: 2.5rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    transform: scale(0.9);
+    transition: all 0.3s ease-in-out;
+}
+.modal-overlay.active .modal-content {
+    transform: scale(1);
+}
+.modal-content h2 {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+.modal-content .payment-info {
+    margin: 2rem 0;
+    text-align: left;
+    background: var(--background-light);
+    padding: 1rem;
+    border-radius: 8px;
+}
+.payment-info p {
+    font-size: 1rem;
+    color: var(--text-light);
+    margin-bottom: 0.8rem;
+}
+.payment-info strong {
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    display: block;
+    margin-top: 0.25rem;
+}
+.payment-info .total-payment {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ef4444; /* Merah */
+}
+.modal-content .btn-confirm-payment {
+    background: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+}
+
+/* Style untuk status Menunggu Validasi */
+.status-validating span {
+    color: #f97316; /* Warna oranye */
+    font-weight: 600;
+}
+.status-validating .progress {
+    background: #f97316; /* Warna oranye */
+}
+

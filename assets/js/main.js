@@ -125,11 +125,11 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-     // =================================================================
-    // MODUL 4: PEMUATAN DATA DINAMIS
+    // =================================================================
+    // MODUL 4: PEMUATAN DATA DINAMIS (DISEMPURNAKAN)
     // =================================================================
 
-    // --- Memuat Daftar Kompetisi (REVISI UNTUK MENAMPILKAN DETAIL KARTU) ---
+    // --- Memuat Daftar Kompetisi di Halaman Utama ---
     const eventListWrapper = document.querySelector('.event-list-wrapper');
     if (eventListWrapper) {
         const eventListContainer = document.getElementById('event-list-container');
@@ -140,56 +140,33 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(data => {
                 if (data.status === 'success' && data.data.length > 0) {
                     
-                    // --- PERUBAHAN UTAMA DI FUNGSI INI ---
-                    // Fungsi untuk membuat HTML satu kartu dengan detail lengkap
                     const createCardHTML = (competition) => {
-                        // Format tanggal agar lebih mudah dibaca
                         const options = { year: 'numeric', month: 'long', day: 'numeric' };
                         const startDate = new Date(competition.tanggal_mulai_daftar).toLocaleDateString('id-ID', options);
                         const endDate = new Date(competition.tanggal_akhir_daftar).toLocaleDateString('id-ID', options);
-
-                        // Potong deskripsi jika terlalu panjang
-                        const shortDescription = competition.deskripsi.length > 100 
-                            ? competition.deskripsi.substring(0, 100) + '...' 
-                            : competition.deskripsi;
+                        const shortDescription = competition.deskripsi.length > 100 ? competition.deskripsi.substring(0, 100) + '...' : competition.deskripsi;
 
                         return `
                             <div class="event-card">
-                                <div class="event-card-banner">
-                                    <img src="assets/images/${competition.banner_img}" alt="${competition.nama_lomba}">
-                                </div>
+                                <div class="event-card-banner"><img src="assets/images/${competition.banner_img}" alt="${competition.nama_lomba}"></div>
                                 <div class="event-card-body">
                                     <h3>${competition.nama_lomba}</h3>
                                     <p class="event-description">${shortDescription}</p>
-                                    <div class="event-info-item">
-                                        <p><strong>Pendaftaran</strong></p>
-                                        <p>${startDate} - ${endDate}</p>
-                                    </div>
-                                    <div class="event-info-item">
-                                        <p><strong>Biaya</strong></p>
-                                        <p>Rp. ${Number(competition.biaya).toLocaleString('id-ID')} atau Gratis</p>
-                                    </div>
-                                    <div class="event-info-item">
-                                        <p><strong>Baca Juknis</strong></p>
-                                    </div>
+                                    <div class="event-info-item"><p><strong>Pendaftaran</strong></p><p>${startDate} - ${endDate}</p></div>
+                                    <div class="event-info-item"><p><strong>Biaya</strong></p><p>Rp. ${Number(competition.biaya).toLocaleString('id-ID')} atau Gratis</p></div>
+                                    <div class="event-info-item"><p><strong>Baca Juknis</strong></p></div>
                                 </div>
-                                <div class="event-card-footer">
-                                    <span>Klik untuk mendaftar</span>
-                                    <a href="event-detail.html?id=${competition.id}" class="btn-daftar">DAFTAR</a>
-                                </div>
+                                <div class="event-card-footer"><span>Klik untuk mendaftar</span><a href="event-detail.html?id=${competition.id}" class="btn-daftar">DAFTAR</a></div>
                             </div>`;
                     };
 
-                    // Hapus konten lama dan isi dengan kartu baru
                     eventListContainer.innerHTML = '';
                     data.data.forEach(competition => {
                         eventListContainer.innerHTML += createCardHTML(competition);
                     });
 
-                    // Gandakan kartu untuk efek infinite scroll
                     eventListContainer.innerHTML += eventListContainer.innerHTML;
 
-                    // Logika infinite scroll (tidak berubah)
                     function handleInfiniteScroll() {
                         if (window.clearTimeout(isScrolling)) { /* ... */ }
                         isScrolling = setTimeout(function() {
@@ -213,6 +190,7 @@ document.addEventListener("DOMContentLoaded", function() {
             });
     }
 
+    // --- Memuat Daftar Transaksi di Halaman Transaksi ---
     const transactionContainer = document.getElementById('transaction-list-container');
     if (transactionContainer) {
         fetch('api/get_transactions.php')
@@ -224,25 +202,97 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 if (data.status === 'success') {
                     data.data.forEach(trx => {
-                        const isPaid = trx.payment_status === 'paid';
+                        
+                        // --- LOGIKA BARU UNTUK TIGA STATUS ---
+                        let statusHTML = '';
+                        let buttonState = '';
+
+                        if (trx.payment_status === 'paid') {
+                            statusHTML = `<div class="status-paid"><span>Paid</span><div class="progress-bar"><div class="progress" style="width: 100%;"></div></div></div>`;
+                            buttonState = 'disabled';
+                        } else if (trx.payment_status === 'Menunggu Validasi') {
+                            statusHTML = `<div class="status-validating"><span>Menunggu Validasi</span><div class="progress-bar"><div class="progress" style="width: 50%;"></div></div></div>`;
+                            buttonState = 'disabled'; // Tombol upload juga nonaktif
+                        } else { // Default (pending_payment atau lainnya)
+                            statusHTML = `<div class="status-no-paid"><span>No Paid</span><div class="progress-bar"><div class="progress" style="width: 10%;"></div></div><small>Segera bayar</small></div>`;
+                            buttonState = '';
+                        }
+
                         transactionContainer.innerHTML += `
                             <div class="transaction-row">
-                                <div>#${trx.id}</div>
+                                <div>#${trx.transaction_code || trx.id}</div>
                                 <div>${trx.nama_lomba}</div>
-                                <div><button class="btn-upload-bukti" ${isPaid ? 'disabled' : ''}>Upload Bukti</button></div>
+                                <div><button class="btn-upload-bukti" data-trx-id="${trx.id}" ${buttonState}>Upload Bukti</button></div>
                                 <div>Rp. ${Number(trx.amount || 0).toLocaleString('id-ID')}</div>
-                                <div class="status-cell">
-                                    <div class="${isPaid ? 'status-paid' : 'status-no-paid'}">
-                                        <span>${isPaid ? 'Paid' : 'No Paid'}</span>
-                                        <div class="progress-bar"><div class="progress" style="width: ${isPaid ? '100%' : '10%'}"></div></div>
-                                    </div>
-                                </div>
+                                <div class="status-cell">${statusHTML}</div>
                             </div>`;
                     });
+
+                    addEventListenersToUploadButtons();
+
                 } else {
                     transactionContainer.innerHTML += `<p class="status-message">${data.message}</p>`;
                 }
             }).catch(error => console.error('Kesalahan memuat transaksi:', error));
+    }
+    
+    // --- Fungsi untuk menangani tombol upload bukti ---
+    function addEventListenersToUploadButtons() {
+        document.querySelectorAll('.btn-upload-bukti').forEach(button => {
+            if (button.disabled) return;
+
+            button.addEventListener('click', function() {
+                const transactionId = this.dataset.trxId;
+                const fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.accept = ".jpg,.jpeg,.png,.pdf";
+
+                fileInput.onchange = () => {
+                    if (fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        const formData = new FormData();
+                        formData.append('proof_file', file);
+                        formData.append('transaction_id', transactionId);
+
+                        fetch('api/upload_proof.php', { method: 'POST', body: formData })
+                            .then(response => response.json())
+                            .then(data => { alert(data.message); })
+                            .catch(error => console.error('Error:', error));
+                    }
+                };
+                fileInput.click();
+            });
+        });
+    }
+
+    // --- Memuat Riwayat Kejuaraan di Halaman History ---
+    const historyContainer = document.getElementById('history-list-container');
+    if (historyContainer) {
+        fetch('api/get_history.php')
+            .then(response => response.json())
+            .then(data => {
+                historyContainer.innerHTML = ''; // Kosongkan dulu
+                if (data.status === 'success') {
+                    data.data.forEach(item => {
+                        const eventDate = new Date(item.tanggal_mulai_daftar).toLocaleDateString('id-ID', { year: 'numeric', month: 'long' });
+                        historyContainer.innerHTML += `
+                            <div class="history-card">
+                                <div class="history-card-header">
+                                    <h3>${item.nama_lomba}</h3>
+                                    <p>Mahasiswa - Perguruan Tinggi</p>
+                                    <span>${eventDate}</span>
+                                </div>
+                                <div class="history-card-body">
+                                    <p>Detail kejuaraan akan ditampilkan di sini.</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    // Tampilkan pesan jika tidak ada history
+                    historyContainer.innerHTML = `<p class="status-message">${data.message}</p>`;
+                }
+            });
     }
 
     // =================================================================
@@ -306,137 +356,168 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // =================================================================
-    // MODUL 6: FUNGSI HALAMAN PEMBAYARAN (CHECKOUT)
-    // =================================================================
-    const paymentContainer = document.getElementById('payment-container');
-    if (paymentContainer) {
-        const competitionItemsContainer = document.getElementById('competition-items-container');
-        const merchandiseContainer = document.getElementById('merchandise-items-container');
-        const totalCostElement = document.getElementById('total-cost');
-        const checkoutButton = document.getElementById('process-checkout-btn');
-        const urlParams = new URLSearchParams(window.location.search);
-        const competitionId = urlParams.get('id');
-        let cart = [];
+// MODUL 6: FUNGSI HALAMAN PEMBAYARAN (CHECKOUT)
+// =================================================================
+const paymentContainer = document.getElementById('payment-container');
+if (paymentContainer) {
+    const competitionItemsContainer = document.getElementById('competition-items-container');
+    const merchandiseContainer = document.getElementById('merchandise-items-container');
+    const totalCostElement = document.getElementById('total-cost');
+    const checkoutButton = document.getElementById('process-checkout-btn');
+    const urlParams = new URLSearchParams(window.location.search);
+    const competitionId = urlParams.get('id');
+    const user = JSON.parse(localStorage.getItem('user')); // Ambil data user di awal
+    let cart = [];
 
-        function updateTotal() {
-            let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            totalCostElement.textContent = `Rp ${total.toLocaleString('id-ID')}`;
-        }
-
-        function handleItemSelection() {
-            document.querySelectorAll('.checkout-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const itemData = this.dataset;
-                    const itemId = parseInt(itemData.id);
-                    cart = cart.filter(ci => !(ci.id === itemId && ci.type === 'competition')); // Hapus dulu
-                    if (this.checked) {
-                        cart.push({ id: itemId, name: itemData.name, price: parseFloat(itemData.price), quantity: 1, type: itemData.type });
-                    }
-                    updateTotal();
-                });
-            });
-
-            document.querySelectorAll('.stepper-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const itemData = this.dataset;
-                    const itemId = parseInt(itemData.id);
-                    let itemInCart = cart.find(ci => ci.id === itemId && ci.type === 'merchandise');
-                    if (this.classList.contains('plus')) {
-                        if (itemInCart) itemInCart.quantity++;
-                        else cart.push({ id: itemId, name: itemData.name, price: parseFloat(itemData.price), quantity: 1, type: itemData.type });
-                    } else if (this.classList.contains('minus') && itemInCart) {
-                        itemInCart.quantity--;
-                    }
-                    cart = cart.filter(ci => ci.quantity > 0);
-                    document.getElementById(`quantity-${itemId}`).textContent = itemInCart ? itemInCart.quantity : 0;
-                    updateTotal();
-                });
-            });
-        }
-
-        checkoutButton.addEventListener('click', function() {
-            if (cart.length === 0) return alert("Keranjang Anda kosong.");
-            const checkoutData = { competition_id: competitionId, user_id: user.id, items: cart };
-
-            fetch('api/process_checkout.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(checkoutData)
-            })
-            .then(response => response.json()).then(data => {
-                alert(data.message);
-                if (data.status === 'success') window.location.href = 'transactions.html';
-            }).catch(error => console.error('Error:', error));
-        });
-
-        if (competitionId) {
-            fetch(`api/get_payment_options.php?id=${competitionId}`)
-                .then(response => response.json()).then(data => {
-                    if (data.status === 'success') {
-                        data.data.competition_items.forEach(item => {
-                            competitionItemsContainer.innerHTML += `
-                                <div class="checkout-item">
-                                    <label class="checkout-label"><input type="checkbox" class="checkout-checkbox" data-id="${item.id}" data-name="${item.item_name}" data-price="${item.price}" data-type="competition"> ${item.item_name}</label>
-                                    <span>Rp ${Number(item.price).toLocaleString('id-ID')}</span>
-                                </div>`;
-                        });
-                        data.data.merchandise.forEach(item => {
-                            merchandiseContainer.innerHTML += `
-                                <div class="checkout-item merchandise">
-                                    <div class="item-info"><p>${item.item_name}</p><span>Rp ${Number(item.price).toLocaleString('id-ID')}</span></div>
-                                    <div class="quantity-stepper">
-                                        <button class="stepper-btn minus" data-id="${item.id}" data-name="${item.item_name}" data-price="${item.price}" data-type="merchandise">-</button>
-                                        <span id="quantity-${item.id}">0</span>
-                                        <button class="stepper-btn plus" data-id="${item.id}" data-name="${item.item_name}" data-price="${item.price}" data-type="merchandise">+</button>
-                                    </div>
-                                </div>`;
-                        });
-                        handleItemSelection();
-                    }
-                }).catch(error => console.error('Error:', error));
-        }
+    function updateTotal() {
+        let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        totalCostElement.textContent = `Rp ${total.toLocaleString('id-ID')}`;
     }
+
+    function handleItemSelection() {
+        document.querySelectorAll('.checkout-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const itemData = this.dataset;
+                const itemId = parseInt(itemData.id);
+                cart = cart.filter(ci => !(ci.id === itemId && ci.type === 'competition'));
+                if (this.checked) {
+                    cart.push({ id: itemId, name: itemData.name, price: parseFloat(itemData.price), quantity: 1, type: itemData.type });
+                }
+                updateTotal();
+            });
+        });
+        document.querySelectorAll('.stepper-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const itemData = this.dataset;
+                const itemId = parseInt(itemData.id);
+                let itemInCart = cart.find(ci => ci.id === itemId && ci.type === 'merchandise');
+                if (this.classList.contains('plus')) {
+                    if (itemInCart) itemInCart.quantity++;
+                    else cart.push({ id: itemId, name: itemData.name, price: parseFloat(itemData.price), quantity: 1, type: itemData.type });
+                } else if (this.classList.contains('minus') && itemInCart) {
+                    itemInCart.quantity--;
+                }
+                cart = cart.filter(ci => ci.quantity > 0);
+                const quantityElement = document.getElementById(`quantity-${itemId}`);
+                if(quantityElement) {
+                    const updatedItem = cart.find(ci => ci.id === itemId && ci.type === 'merchandise');
+                    quantityElement.textContent = updatedItem ? updatedItem.quantity : 0;
+                }
+                updateTotal();
+            });
+        });
+    }
+    
+    // --- Fungsi BARU untuk menampilkan popup ---
+    function showPaymentPopup(details) {
+        const modalOverlay = document.createElement('div');
+        modalOverlay.className = 'modal-overlay';
+        const totalFormatted = Number(details.total).toLocaleString('id-ID');
+        modalOverlay.innerHTML = `
+            <div class="modal-content">
+                <h2>Instruksi Pembayaran</h2>
+                <div class="payment-info">
+                    <p>Silakan transfer sejumlah: <strong class="total-payment">Rp ${totalFormatted}</strong></p>
+                    <p>Jumlah tersebut sudah termasuk kode unik <strong>${details.kode_unik}</strong> untuk verifikasi.</p>
+                    <hr style="margin: 1rem 0;">
+                    <p>Ke nomor rekening berikut: <strong>${details.rekening}</strong></p>
+                </div>
+                <button id="confirm-and-close" class="btn-confirm-payment">Saya Mengerti, Lanjutkan</button>
+            </div>`;
+        document.body.appendChild(modalOverlay);
+        setTimeout(() => modalOverlay.classList.add('active'), 10);
+        document.getElementById('confirm-and-close').addEventListener('click', () => {
+            window.location.href = 'transactions.html';
+        });
+    }
+
+    // --- Event listener untuk tombol checkout utama (DIUBAH) ---
+    checkoutButton.addEventListener('click', function() {
+        if (!user) return alert("Sesi Anda telah berakhir, silakan login kembali.");
+        if (cart.length === 0) return alert("Keranjang Anda kosong.");
+        
+        const checkoutData = { competition_id: competitionId, user_id: user.id, items: cart };
+
+        fetch('api/process_checkout.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(checkoutData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Panggil fungsi popup, bukan alert
+                showPaymentPopup(data.paymentDetails);
+            } else {
+                alert(data.message); // Tampilkan pesan error jika checkout gagal
+            }
+        }).catch(error => console.error('Error:', error));
+    });
+
+    // Fungsi untuk memuat semua opsi pembayaran saat halaman dibuka
+    function loadPaymentOptions() {
+        if (!competitionId) {
+            alert("ID Kompetisi tidak ditemukan.");
+            return;
+        }
+        fetch(`api/get_payment_options.php?id=${competitionId}`)
+            .then(response => response.json()).then(data => {
+                if (data.status === 'success') {
+                    data.data.competition_items.forEach(item => {
+                        competitionItemsContainer.innerHTML += `<div class="checkout-item"><label class="checkout-label"><input type="checkbox" class="checkout-checkbox" data-id="${item.id}" data-name="${item.item_name}" data-price="${item.price}" data-type="competition"> ${item.item_name}</label><span>Rp ${Number(item.price).toLocaleString('id-ID')}</span></div>`;
+                    });
+                    data.data.merchandise.forEach(item => {
+                        merchandiseContainer.innerHTML += `<div class="checkout-item merchandise"><div class="item-info"><p>${item.item_name}</p><span>Rp ${Number(item.price).toLocaleString('id-ID')}</span></div><div class="quantity-stepper"><button class="stepper-btn minus" data-id="${item.id}" data-name="${item.item_name}" data-price="${item.price}" data-type="merchandise">-</button><span id="quantity-${item.id}">0</span><button class="stepper-btn plus" data-id="${item.id}" data-name="${item.item_name}" data-price="${item.price}" data-type="merchandise">+</button></div></div>`;
+                    });
+                    handleItemSelection();
+                }
+            }).catch(error => console.error('Error:', error));
+    }
+    
+    // Panggil fungsi utama
+    loadPaymentOptions();
+}
      // =================================================================
     // MODUL 7: FUNGSI HALAMAN AKUN (Disesuaikan dengan Desain Anda)
     // =================================================================
-    const profileForm = document.getElementById('profile-form');
-    if (profileForm) {
-        
-        // --- Fungsi untuk memuat data profil dari API dan mengisinya ke form ---
+    const accountCard = document.querySelector('.account-card');
+    if (accountCard) {
+
+        // --- Fungsi untuk memuat data profil dari API ---
         function loadProfileData() {
             fetch('api/get_profile.php')
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
                         const profile = data.data;
-                        
-                        // Isi form dengan data yang ada dari database
+                        // Isi form dengan data yang ada
                         document.getElementById('tingkatan').value = profile.tingkatan || "";
                         document.getElementById('institusi').value = profile.institusi || "";
                         
                         // Update UI untuk setiap dokumen
-                        updateDocumentUI('cv', profile.cv_path);
-                        updateDocumentUI('portfolio', profile.portfolio_path);
-                        updateDocumentUI('ktm', profile.ktm_path);
+                        updateDocumentUI('cv', profile.cv_path, 'CV (Curriculum Vitae)');
+                        updateDocumentUI('portfolio', profile.portfolio_path, 'Portofolio');
+                        updateDocumentUI('ktm', profile.ktm_path, 'KTM / Kartu Pelajar');
                     }
                 })
                 .catch(error => console.error('Error memuat profil:', error));
         }
 
         // --- Fungsi untuk memperbarui tampilan setiap baris dokumen ---
-        function updateDocumentUI(docType, filePath) {
-            const statusEl = document.querySelector(`button[data-doctype='${docType}']`).previousElementSibling.querySelector('p');
-            const buttonEl = document.querySelector(`button[data-doctype='${docType}']`);
+        function updateDocumentUI(docType, filePath, docName) {
+            const row = document.querySelector(`.document-row[data-doctype='${docType}']`);
+            if (!row) return;
+
+            const statusEl = row.querySelector('p');
+            const buttonEl = row.querySelector('.btn-upload');
 
             if (filePath) {
-                // Jika file SUDAH diupload
-                statusEl.innerHTML = `Dokumen sudah ada. <a href="uploads/documents/${filePath}" target="_blank">Lihat File</a>`;
+                statusEl.innerHTML = `<span class="uploaded-file-name">${filePath}</span>`;
                 statusEl.className = 'status-uploaded';
-                buttonEl.textContent = 'Edit';
+                buttonEl.textContent = 'Ganti';
                 buttonEl.classList.add('edit');
             } else {
-                // Jika file BELUM diupload
-                statusEl.textContent = `Dokumen belum diupload`;
+                statusEl.textContent = 'Dokumen belum diupload';
                 statusEl.className = '';
                 buttonEl.textContent = 'Upload';
                 buttonEl.classList.remove('edit');
@@ -444,6 +525,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
 
         // --- Event listener untuk form update profil ---
+        const profileForm = document.getElementById('profile-form');
         profileForm.addEventListener('submit', function(event) {
             event.preventDefault();
             const formData = new FormData(this);
@@ -454,16 +536,19 @@ document.addEventListener("DOMContentLoaded", function() {
                 });
         });
 
-        // --- Event listener untuk semua tombol upload ---
+        // --- Event listener untuk upload dokumen ---
         document.querySelectorAll('.btn-upload').forEach(button => {
             button.addEventListener('click', function() {
                 const docType = this.dataset.doctype;
                 const fileInput = document.createElement('input');
                 fileInput.type = 'file';
+                fileInput.accept = ".pdf,.jpg,.jpeg,.png";
+                
                 fileInput.onchange = () => {
                     if (fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
                         const formData = new FormData();
-                        formData.append('document_file', fileInput.files[0]);
+                        formData.append('document_file', file);
                         formData.append('document_type', docType);
 
                         fetch('api/upload_document.php', { method: 'POST', body: formData })
@@ -471,7 +556,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             .then(data => {
                                 alert(data.message);
                                 if (data.status === 'success') {
-                                    loadProfileData(); // Muat ulang data untuk update UI
+                                    updateDocumentUI(docType, data.fileName);
                                 }
                             });
                     }
@@ -482,7 +567,8 @@ document.addEventListener("DOMContentLoaded", function() {
         
         // Panggil fungsi utama untuk memuat data saat halaman dibuka
         loadProfileData();
-    }
+
+    } 
     // =================================================================
     // MODUL 8: FUNGSI UPLOAD DOKUMEN DI HALAMAN AKUN (KODE BARU)
     // =================================================================
@@ -599,4 +685,31 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             });
     }
+    // =================================================================
+// MODUL 9: FUNGSI HALAMAN PENDAFTARAN GRATIS
+// =================================================================
+const freeRegisForm = document.getElementById('free-regis-form');
+if (freeRegisForm) {
+    freeRegisForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const competitionId = urlParams.get('id');
+        const formData = new FormData(this);
+        formData.append('competition_id', competitionId);
+
+        fetch('api/submit_free_req.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            if (data.status === 'success') {
+                window.location.href = 'transactions.html';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+}
 });

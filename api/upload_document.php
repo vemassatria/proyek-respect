@@ -38,7 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("si", $new_file_name, $user_id);
         
         if ($stmt->execute()) {
-            echo json_encode(['status' => 'success', 'message' => 'Dokumen berhasil diunggah!']);
+           echo json_encode([
+                'status' => 'success', 
+                'message' => 'Dokumen berhasil diunggah!',
+                'fileName' => $new_file_name // Tambahkan ini
+            ]);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'Gagal menyimpan path file ke database.']);
         }
