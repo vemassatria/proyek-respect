@@ -42,7 +42,7 @@ function createCompetitionCard(competition) {
             </div>
             <div class="event-card-footer">
                 <span>Klik untuk mendaftar</span>
-                <a href="event-detail.html?id=${competition.id}" class="btn-daftar">DAFTAR</a>
+                <a href="event-detail.php?id=${competition.id}" class="btn-daftar">DAFTAR</a>
             </div>
         </div>`;
 }
@@ -93,8 +93,8 @@ function loadCompetitionDetail() {
     const btnGratis = document.getElementById('btn-gratis');
     const btnBerbayar = document.getElementById('btn-berbayar');
     if (btnGratis && btnBerbayar) {
-        btnGratis.addEventListener('click', () => { if(competitionId) window.location.href = `free-registration.html?id=${competitionId}`; });
-        btnBerbayar.addEventListener('click', () => { if(competitionId) window.location.href = `payment.html?id=${competitionId}`; });
+        btnGratis.addEventListener('click', () => { if(competitionId) window.location.href = `free-registration.php?id=${competitionId}`; });
+        btnBerbayar.addEventListener('click', () => { if(competitionId) window.location.href = `payment.php?id=${competitionId}`; });
     }
 }
 

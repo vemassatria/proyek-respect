@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Respect.id</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <?php 
+        $pageTitle = 'Home';
+        include 'components/_head.php'; 
+    ?>
 </head>
 <body>
-    
     <main class="main-content">
         <header class="home-header">
             <div class="header-text">
@@ -28,8 +27,7 @@
         </section>
     </main>
 
-    <div id="navbar-placeholder"></div>
-
+    <?php include 'components/_navbar.php'; ?>
     <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>

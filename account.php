@@ -1,20 +1,18 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akun Saya - Respect.id</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <?php 
+        $pageTitle = 'Akun Saya';
+        include 'components/_head.php'; 
+    ?>
 </head>
 <body>
-    
     <main class="main-content">
-        <a href="index.html" class="back-button" style="position: absolute; top: 2rem; left: 2rem;">
+        <a href="index.php" class="back-button" style="position: absolute; top: 2rem; left: 2rem;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M19 12H5M12 19L5 12L12 5" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </a>
-
         <div class="account-card">
             <header class="account-header">
                 <div class="account-greeting">
@@ -25,9 +23,7 @@
                     <img src="assets/images/icon-account-profile.svg" alt="Profile">
                 </div>
             </header>
-
             <div class="divider"></div>
-
             <form id="profile-form" class="profile-form">
                 <div class="form-group">
                     <label for="tingkatan">Tingkatan</label>
@@ -43,39 +39,26 @@
                 </div>
                 <button type="submit" class="btn-save-profile">Simpan Perubahan</button>
             </form>
-
             <div class="divider"></div>
-
             <section class="document-list">
                 <h3>Kelengkapan Dokumen</h3>
-                <div class="document-row">
-                    <div class="document-info">
-                        <h3>CV (Curriculum Vitae)</h3>
-                        <p>Dokumen belum diupload</p>
-                    </div>
+                <div class="document-row" data-doctype="cv">
+                    <div class="document-info"><h3>CV (Curriculum Vitae)</h3><p>Dokumen belum diupload</p></div>
                     <button class="btn-upload" data-doctype="cv">Upload</button>
                 </div>
-                <div class="document-row">
-                    <div class="document-info">
-                        <h3>Portofolio</h3>
-                        <p>Dokumen belum diupload</p>
-                    </div>
+                <div class="document-row" data-doctype="portfolio">
+                    <div class="document-info"><h3>Portofolio</h3><p>Dokumen belum diupload</p></div>
                     <button class="btn-upload" data-doctype="portfolio">Upload</button>
                 </div>
-                <div class="document-row">
-                    <div class="document-info">
-                        <h3>KTM / Kartu Pelajar</h3>
-                        <p>Dokumen belum diupload</p>
-                    </div>
+                <div class="document-row" data-doctype="ktm">
+                    <div class="document-info"><h3>KTM / Kartu Pelajar</h3><p>Dokumen belum diupload</p></div>
                     <button class="btn-upload" data-doctype="ktm">Upload</button>
                 </div>
             </section>
-
-             <button id="logout-button" class="btn-logout-custom">Logout</button>
+            <button id="logout-button" class="btn-logout-custom">Logout</button>
         </div>
     </main>
-
-    <div id="navbar-placeholder"></div>
+    <?php include 'components/_navbar.php'; ?>
     <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>
