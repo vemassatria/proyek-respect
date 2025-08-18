@@ -1,0 +1,65 @@
+/**
+ * assets/js/modules/auth.js
+ * Modul untuk menangani semua fungsi autentikasi.
+ */
+
+function handlePasswordToggle() {
+    const eyeIconOpen = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    const eyeIconSlashed = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path><line x1="1" y1="1" x2="23" y2="23" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></line></svg>`;
+    
+    document.querySelectorAll('.toggle-password').forEach(button => {
+        button.addEventListener('click', function() {
+            const passwordInput = this.previousElementSibling;
+            const isPasswordHidden = passwordInput.type === 'password';
+            passwordInput.type = isPasswordHidden ? 'text' : 'password';
+            this.innerHTML = isPasswordHidden ? eyeIconSlashed : eyeIconOpen;
+        });
+    });
+}
+
+function handleRegisterForm() {
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            fetch('api/register.php', { method: 'POST', body: new FormData(this) })
+                .then(response => response.json()).then(data => {
+                    alert(data.message);
+                    if (data.status === 'success') window.location.href = 'login.html';
+                }).catch(error => console.error('Kesalahan Registrasi:', error));
+        });
+    }
+}
+
+function handleLoginForm() {
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            fetch('api/login.php', { method: 'POST', body: new FormData(this) })
+                .then(response => response.json()).then(data => {
+                    alert(data.message);
+                    if (data.status === 'success') {
+                        localStorage.setItem('user', JSON.stringify(data.data));
+                        window.location.href = 'index.html';
+                    }
+                }).catch(error => console.error('Kesalahan Login:', error));
+        });
+    }
+}
+
+function setupAuthPageNavigations() {
+    const goToLoginBtn = document.getElementById('goToLogin');
+    if (goToLoginBtn) { goToLoginBtn.addEventListener('click', () => { window.location.href = 'login.html'; }); }
+
+    const goToRegisterBtn = document.getElementById('goToRegister');
+    if (goToRegisterBtn) { goToRegisterBtn.addEventListener('click', () => { window.location.href = 'register.html'; }); }
+}
+
+
+export function initAuth() {
+    handlePasswordToggle();
+    handleRegisterForm();
+    handleLoginForm();
+    setupAuthPageNavigations();
+}
