@@ -8,7 +8,7 @@
 </head>
 <body class="bg-pink-gradient">
     <main class="main-content-flow">
-        <a href="event-detail.html" class="back-button-corner">
+        <a href="event-detail.php" class="back-button-corner">
             </a>
         
         <form id="free-regis-form" class="registration-container">

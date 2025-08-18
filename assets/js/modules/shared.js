@@ -7,11 +7,11 @@
 export function protectRoutes() {
     const user = JSON.parse(localStorage.getItem('user'));
     const currentPage = window.location.pathname.split("/").pop();
-    const publicPages = ['login.html', 'register.html', ''];
+    const publicPages = ['login.php', 'register.php', ''];
 
     if (!user && !publicPages.includes(currentPage)) {
         alert("Anda harus login terlebih dahulu untuk mengakses halaman ini.");
-        window.location.href = 'login.html';
+        window.location.href = 'login.php';
         return false; // Mengindikasikan untuk menghentikan eksekusi skrip lebih lanjut
     }
     return true; // Lanjutkan eksekusi
@@ -21,7 +21,7 @@ export function protectRoutes() {
 export function loadNavbar() {
     const navbarPlaceholder = document.getElementById('navbar-placeholder');
     if (navbarPlaceholder) {
-        fetch('bottom-navbar.html')
+        fetch('bottom-navbar.php')
             .then(response => response.ok ? response.text() : Promise.reject('Gagal memuat navbar'))
             .then(data => {
                 navbarPlaceholder.innerHTML = data;
@@ -47,7 +47,7 @@ export function handleLogout() {
                 .then(data => {
                     if (data.status === 'success') {
                         localStorage.removeItem('user');
-                        window.location.href = 'login.html';
+                        window.location.href = 'login.php';
                     } else {
                         alert('Gagal logout. Silakan coba lagi.');
                     }

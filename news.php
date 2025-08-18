@@ -3,38 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaksi - Respect.id</title>
+    <title>News & Article - Respect.id</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
     <main class="main-content">
         <div class="page-header">
-             <a href="index.php" class="back-button">
+            <a href="index.php" class="back-button">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M19 12H5M12 19L5 12L12 5" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </a>
             <div class="page-title">
-                <h2>TRANSACTION</h2>
-                <p>Daftar Pembayaran</p>
+                <h2>NEWS & ARTICLE</h2>
+                <p>Berita terkini dan artikel terpercaya</p>
             </div>
             <img src="assets/images/logo-respect.png" alt="Respect Logo" class="page-logo">
         </div>
 
-        <div class="transaction-table" id="transaction-list-container">
-            <div class="transaction-header">
-                <div>No Transaksi</div>
-                <div>Proses Paket</div>
-                <div>Upload Bukti Transfer</div>
-                <div>Amount</div>
-                <div>Berlaku Hingga</div>
+        <section class="news-section">
+            <h2>Berita Terkini</h2>
+            <div id="featured-news-container" class="featured-news-wrapper">
+                </div>
+        </section>
+
+        <section class="articles-section">
+            <h2>Artikel Organisasi</h2>
+            <div class="articles-container">
+                <div id="organizational-articles-left" class="article-column">
+                    </div>
+                <div id="organizational-articles-right" class="article-column">
+                    </div>
             </div>
-        </div>
-
+        </section>
     </main>
-
+    
     <div id="navbar-placeholder"></div>
-
     <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>

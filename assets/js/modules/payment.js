@@ -1,9 +1,9 @@
 /**
  * assets/js/modules/payment.js
- * Modul untuk menangani halaman pembayaran (payment.html) dan pendaftaran gratis (free-registration.html).
+ * Modul untuk menangani halaman pembayaran (payment.php) dan pendaftaran gratis (free-registration.php).
  */
 
-// --- BAGIAN UNTUK HALAMAN PEMBAYARAN BERBAYAR (payment.html) ---
+// --- BAGIAN UNTUK HALAMAN PEMBAYARAN BERBAYAR (payment.php) ---
 function handlePaidRegistration() {
     const paymentContainer = document.getElementById('payment-container');
     if (!paymentContainer) return;
@@ -78,7 +78,7 @@ function handlePaidRegistration() {
         document.body.appendChild(modalOverlay);
         setTimeout(() => modalOverlay.classList.add('active'), 10);
         document.getElementById('confirm-and-close').addEventListener('click', () => {
-            window.location.href = 'transactions.html';
+            window.location.href = 'transactions.php';
         });
     }
 
@@ -140,7 +140,7 @@ function handlePaidRegistration() {
     loadPaymentOptions();
 }
 
-// --- BAGIAN UNTUK HALAMAN PENDAFTARAN GRATIS (free-registration.html) ---
+// --- BAGIAN UNTUK HALAMAN PENDAFTARAN GRATIS (free-registration.php) ---
 function handleFreeRegistration() {
     const freeRegisForm = document.getElementById('free-regis-form');
     if (!freeRegisForm) return;
@@ -163,7 +163,7 @@ function handleFreeRegistration() {
         .then(data => {
             alert(data.message);
             if (data.status === 'success') {
-                window.location.href = 'transactions.html';
+                window.location.href = 'transactions.php';
             }
         })
         .catch(error => {

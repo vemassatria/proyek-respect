@@ -25,7 +25,7 @@ function handleRegisterForm() {
             fetch('api/register.php', { method: 'POST', body: new FormData(this) })
                 .then(response => response.json()).then(data => {
                     alert(data.message);
-                    if (data.status === 'success') window.location.href = 'login.html';
+                    if (data.status === 'success') window.location.href = 'login.php';
                 }).catch(error => console.error('Kesalahan Registrasi:', error));
         });
     }
@@ -41,7 +41,7 @@ function handleLoginForm() {
                     alert(data.message);
                     if (data.status === 'success') {
                         localStorage.setItem('user', JSON.stringify(data.data));
-                        window.location.href = 'index.html';
+                        window.location.href = 'index.php';
                     }
                 }).catch(error => console.error('Kesalahan Login:', error));
         });
@@ -50,10 +50,10 @@ function handleLoginForm() {
 
 function setupAuthPageNavigations() {
     const goToLoginBtn = document.getElementById('goToLogin');
-    if (goToLoginBtn) { goToLoginBtn.addEventListener('click', () => { window.location.href = 'login.html'; }); }
+    if (goToLoginBtn) { goToLoginBtn.addEventListener('click', () => { window.location.href = 'login.php'; }); }
 
     const goToRegisterBtn = document.getElementById('goToRegister');
-    if (goToRegisterBtn) { goToRegisterBtn.addEventListener('click', () => { window.location.href = 'register.html'; }); }
+    if (goToRegisterBtn) { goToRegisterBtn.addEventListener('click', () => { window.location.href = 'register.php'; }); }
 }
 
 

@@ -30,28 +30,28 @@ document.addEventListener("DOMContentLoaded", function() {
     const page = window.location.pathname.split("/").pop();
 
     switch(page) {
-        case 'login.html':
-        case 'register.html':
+        case 'login.php':
+        case 'register.php':
             initAuth();
             break;
-        case 'index.html':
-        case 'event-detail.html':
+        case 'index.php':
+        case 'event-detail.php':
             initCompetitions();
             break;
-        case 'account.html':
+        case 'account.php':
             initAccount();
             break;
-        case 'payment.html':
-        case 'free-registration.html':
+        case 'payment.php':
+        case 'free-registration.php':
             initPayment();
             break;
-        case 'transactions.html':
+        case 'transactions.php':
             initTransactions();
             break;
-        case 'history.html':
+        case 'history.php':
             initHistory();
             break;
-        case 'news.html':
+        case 'news.php':
             initNews();
             break;
     }
