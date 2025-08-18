@@ -1,6 +1,6 @@
 /**
  * assets/js/modules/shared.js
- * Modul untuk fungsi bersama: route protection, pemuatan navbar, dan logika logout.
+ * Modul untuk fungsi bersama: route protection, logika logout, dan aktivasi navlink.
  */
 
 // 1. Proteksi Halaman
@@ -12,12 +12,12 @@ export function protectRoutes() {
     if (!user && !publicPages.includes(currentPage)) {
         alert("Anda harus login terlebih dahulu untuk mengakses halaman ini.");
         window.location.href = 'login.php';
-        return false; // Mengindikasikan untuk menghentikan eksekusi skrip lebih lanjut
+        return false;
     }
-    return true; // Lanjutkan eksekusi
+    return true;
 }
 
-// 3. Menangani Logout
+// 2. Menangani Logout
 export function handleLogout() {
     const logoutButton = document.getElementById('logout-button');
     if (logoutButton) {
@@ -29,15 +29,14 @@ export function handleLogout() {
                         localStorage.removeItem('user');
                         window.location.href = 'login.php';
                     } else {
-                        alert('Gagal logout. Silakan coba lagi.');
+                        alert('Gagal logout.');
                     }
-                })
-                .catch(error => console.error('Error saat logout:', error));
+                });
         });
     }
 }
 
-// 4. Memuat Data Pengguna Global (misal: di header)
+// 3. Memuat Data Pengguna Global
 export function loadUserData() {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
@@ -50,4 +49,17 @@ export function loadUserData() {
             accountName.textContent = user.nama;
         }
     }
+}
+
+// 4. Mengaktifkan Link Navigasi yang Sesuai
+export function setActiveNavLink() {
+    const currentPage = window.location.pathname.split("/").pop();
+    const activePage = currentPage === '' ? 'index.php' : currentPage;
+
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        if (link.getAttribute('href') === activePage) {
+            link.classList.add('active');
+        }
+    });
 }

@@ -323,9 +323,9 @@ body {
 .bottom-nav {
     position: fixed;
     bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
+    left: 10vw;
+    right: 10vw;
+    max-width: 80vw;
     
     display: flex;
     justify-content: space-around;

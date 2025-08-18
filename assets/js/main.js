@@ -11,22 +11,22 @@ import { initPayment } from './modules/payment.js';
 import { initTransactions } from './modules/transactions.js';
 import { initHistory } from './modules/history.js';
 import { initNews } from './modules/news.js';
-import { protectRoutes, loadNavbar, handleLogout, loadUserData } from './modules/shared.js';
+// Perbaiki baris import di bawah ini
+import { protectRoutes, handleLogout, loadUserData, setActiveNavLink } from './modules/shared.js';
 
 // Jalankan semua skrip setelah DOM selesai dimuat
 document.addEventListener("DOMContentLoaded", function() {
     
-    // 1. Jalankan proteksi halaman
     if (!protectRoutes()) {
-        return; // Hentikan eksekusi jika pengguna tidak diotorisasi
+        return;
     }
 
-    // 2. Jalankan fungsi global yang ada di banyak halaman
+    // Jalankan fungsi global
+    setActiveNavLink(); // Ini akan mengaktifkan link navbar
     handleLogout();
-    loadUserData(); // Untuk menampilkan nama pengguna
+    loadUserData(); 
 
-    // 3. Panggil inisialisasi modul yang spesifik untuk halaman saat ini
-    const page = window.location.pathname.split("/").pop();
+    const page = window.location.pathname.split("/").pop() || 'index.php';
 
     switch(page) {
         case 'login.php':
