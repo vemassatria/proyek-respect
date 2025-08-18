@@ -17,26 +17,6 @@ export function protectRoutes() {
     return true; // Lanjutkan eksekusi
 }
 
-// 2. Memuat Navbar Bawah
-export function loadNavbar() {
-    const navbarPlaceholder = document.getElementById('navbar-placeholder');
-    if (navbarPlaceholder) {
-        fetch('bottom-navbar.php')
-            .then(response => response.ok ? response.text() : Promise.reject('Gagal memuat navbar'))
-            .then(data => {
-                navbarPlaceholder.innerHTML = data;
-                const currentPage = window.location.pathname.split("/").pop();
-                const navLinks = document.querySelectorAll('#navbar-placeholder .nav-link');
-                navLinks.forEach(link => {
-                    if (link.getAttribute('href') === currentPage) {
-                        link.classList.add('active');
-                    }
-                });
-            })
-            .catch(error => console.error('Kesalahan Navigasi:', error));
-    }
-}
-
 // 3. Menangani Logout
 export function handleLogout() {
     const logoutButton = document.getElementById('logout-button');

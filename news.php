@@ -1,25 +1,18 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>News & Article - Respect.id</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <?php 
+        $pageTitle = 'News & Article';
+        include 'components/_head.php'; 
+    ?>
 </head>
 <body>
     <main class="main-content">
-        <div class="page-header">
-            <a href="index.php" class="back-button">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M19 12H5M12 19L5 12L12 5" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </a>
-            <div class="page-title">
-                <h2>NEWS & ARTICLE</h2>
-                <p>Berita terkini dan artikel terpercaya</p>
-            </div>
-            <img src="assets/images/logo-respect.png" alt="Respect Logo" class="page-logo">
-        </div>
+        <?php 
+            $headerTitle = 'NEWS & ARTICLE';
+            $headerSubtitle = 'Berita terkini dan artikel terpercaya';
+            include 'components/_page-header.php'; 
+        ?>
 
         <section class="news-section">
             <h2>Berita Terkini</h2>
@@ -30,15 +23,13 @@
         <section class="articles-section">
             <h2>Artikel Organisasi</h2>
             <div class="articles-container">
-                <div id="organizational-articles-left" class="article-column">
-                    </div>
-                <div id="organizational-articles-right" class="article-column">
-                    </div>
+                <div id="organizational-articles-left" class="article-column"></div>
+                <div id="organizational-articles-right" class="article-column"></div>
             </div>
         </section>
     </main>
     
-    <div id="navbar-placeholder"></div>
+    <?php include 'components/_navbar.php'; ?>
     <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>

@@ -1,25 +1,18 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaksi - Respect.id</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <?php 
+        $pageTitle = 'Transaksi';
+        include 'components/_head.php'; 
+    ?>
 </head>
 <body>
     <main class="main-content">
-        <div class="page-header">
-             <a href="index.php" class="back-button">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M19 12H5M12 19L5 12L12 5" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </a>
-            <div class="page-title">
-                <h2>TRANSACTION</h2>
-                <p>Daftar Pembayaran</p>
-            </div>
-            <img src="assets/images/logo-respect.png" alt="Respect Logo" class="page-logo">
-        </div>
+        <?php 
+            $headerTitle = 'TRANSACTION';
+            $headerSubtitle = 'Daftar Pembayaran';
+            include 'components/_page-header.php'; 
+        ?>
 
         <div class="transaction-table" id="transaction-list-container">
             <div class="transaction-header">
@@ -29,12 +22,10 @@
                 <div>Amount</div>
                 <div>Berlaku Hingga</div>
             </div>
-        </div>
-
+             </div>
     </main>
 
-    <div id="navbar-placeholder"></div>
-
+    <?php include 'components/_navbar.php'; ?>
     <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>

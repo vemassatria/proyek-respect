@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // 2. Jalankan fungsi global yang ada di banyak halaman
-    loadNavbar();
     handleLogout();
     loadUserData(); // Untuk menampilkan nama pengguna
 
