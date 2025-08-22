@@ -48,7 +48,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     padding: 2rem;
 }
@@ -586,6 +586,7 @@ body {
 }
 .page-header .back-button {
     flex-shrink: 0;
+    margin-bottom: 2rem;
 }
 .page-header .page-title {
     text-align: center;
@@ -601,7 +602,7 @@ body {
     margin: 0;
 }
 .page-header .page-logo {
-    width: 50px;
+    width: 7vw;
     height: auto;
 }
 
@@ -615,6 +616,7 @@ body {
     max-width: 90vw;
     padding: 1rem;
     margin-bottom: 1.5rem;
+    margin-top: 1.5rem;
     height: 1vh;
     gap: 1rem;
 }

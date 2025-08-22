@@ -13,6 +13,7 @@
                 <path d="M19 12H5M12 19L5 12L12 5" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </a>
+        <br>
         <div class="account-card">
             <header class="account-header">
                 <div class="account-greeting">
