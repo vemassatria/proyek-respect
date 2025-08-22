@@ -42,7 +42,7 @@ export function loadUserData() {
     if (user) {
         const welcomeMessage = document.getElementById('welcome-message');
         if (welcomeMessage) {
-            welcomeMessage.textContent = `HAI ${user.nama.toUpperCase()}!`;
+            welcomeMessage.textContent = `HALLO ${user.nama.toUpperCase()}!`;
         }
         const accountName = document.getElementById('account-name');
         if (accountName) {
@@ -62,4 +62,17 @@ export function setActiveNavLink() {
             link.classList.add('active');
         }
     });
+}
+
+export function handleDynamicBackButton() {
+    const backButton = document.getElementById('back-to-detail-btn');
+    if (backButton) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const competitionId = urlParams.get('id');
+
+        if (competitionId) {
+            // Jika ID ditemukan, arahkan kembali ke event-detail dengan ID yang sama
+            backButton.href = `event-detail.php?id=${competitionId}`;
+        } 
+    }
 }

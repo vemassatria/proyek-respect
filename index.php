@@ -10,7 +10,7 @@
     <main class="main-content">
         <header class="home-header">
             <div class="header-text">
-                <h3 id="welcome-message">HAI!</h3>
+                <h3 id="welcome-message">HALLO!</h3>
                 <p>Rekomendasi untuk kamu</p>
             </div>
             <div class="header-icons">
