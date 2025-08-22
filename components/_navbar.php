@@ -9,7 +9,7 @@
     </a>
     <a href="transactions.php" class="nav-link">
         <img src="assets/images/icon-transactions.svg" alt="Transaksi">
-        <span>Transaksi</span>
+        <span>Transactions</span>
     </a>
     <a href="history.php" class="nav-link">
         <img src="assets/images/icon-history.svg" alt="History">

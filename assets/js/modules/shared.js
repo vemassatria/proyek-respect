@@ -42,7 +42,7 @@ export function loadUserData() {
     if (user) {
         const welcomeMessage = document.getElementById('welcome-message');
         if (welcomeMessage) {
-            welcomeMessage.textContent = `HAI ${user.nama.toUpperCase()}!`;
+            welcomeMessage.textContent = `HALLO ${user.nama.toUpperCase()}!`;
         }
         const accountName = document.getElementById('account-name');
         if (accountName) {
