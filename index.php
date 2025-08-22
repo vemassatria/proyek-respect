@@ -13,11 +13,14 @@
                 <h3 id="welcome-message">HALLO!</h3>
                 <p>Rekomendasi untuk kamu</p>
             </div>
-            <div class="header-icons">
+            <!-- <div class="header-icons">
                 <img src="assets/images/icon-add-header.svg" alt="Add">
                 <img src="assets/images/icon-idea.svg" alt="Idea">
                 <img src="assets/images/icon-cart.svg" alt="Cart">
                 <img src="assets/images/icon-notif.svg" alt="Notification">
+            </div> -->
+            <div class="header-logo">
+                <img src="assets/images/logo-respect.png" alt="Respect Logo">
             </div>
         </header>
 
