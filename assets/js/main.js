@@ -12,7 +12,7 @@ import { initTransactions } from './modules/transactions.js';
 import { initHistory } from './modules/history.js';
 import { initNews } from './modules/news.js';
 // Perbaiki baris import di bawah ini
-import { protectRoutes, handleLogout, loadUserData, setActiveNavLink } from './modules/shared.js';
+import { protectRoutes, handleLogout, loadUserData, setActiveNavLink, handleDynamicBackButton } from './modules/shared.js';
 
 // Jalankan semua skrip setelah DOM selesai dimuat
 document.addEventListener("DOMContentLoaded", function() {
@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function() {
         return;
     }
 
+    handleDynamicBackButton();
     // Jalankan fungsi global
     setActiveNavLink(); // Ini akan mengaktifkan link navbar
     handleLogout();

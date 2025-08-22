@@ -63,3 +63,16 @@ export function setActiveNavLink() {
         }
     });
 }
+
+export function handleDynamicBackButton() {
+    const backButton = document.getElementById('back-to-detail-btn');
+    if (backButton) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const competitionId = urlParams.get('id');
+
+        if (competitionId) {
+            // Jika ID ditemukan, arahkan kembali ke event-detail dengan ID yang sama
+            backButton.href = `event-detail.php?id=${competitionId}`;
+        } 
+    }
+}
