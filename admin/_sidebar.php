@@ -7,11 +7,12 @@
         <a href="dashboard.php" class="nav-link">
             <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
         </a>
-        <a href="manage_competitions.php" class="nav-link active">
-            <i class="fas fa-trophy"></i> <span>Manajemen Lomba</span>
+        <a href="manage_competitions.php" class="nav-link">
+            <i class="fas fa-trophy"></i>
+            <span>Manajemen Lomba</span>
         </a>
-        <a href="#" class="nav-link">
-            <i class="fas fa-newspaper"></i> <span>Manajemen Berita</span>
+        <a href="manage_news.php" class="nav-link active"> <i class="fas fa-newspaper"></i>
+            <span>Manajemen Berita</span>
         </a>
         <a href="#" class="nav-link">
             <i class="fas fa-file-invoice-dollar"></i> <span>Verifikasi Transaksi</span>
