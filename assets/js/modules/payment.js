@@ -3,6 +3,8 @@
  * Modul untuk menangani halaman pembayaran (payment.php) dan pendaftaran gratis (free-registration.php).
  */
 
+import Swal from 'https://cdn.jsdelivr.net/npm/sweetalert2@11.10.2/src/sweetalert2.js';
+
 // --- BAGIAN UNTUK HALAMAN PEMBAYARAN BERBAYAR (payment.php) ---
 function handlePaidRegistration() {
     const paymentContainer = document.getElementById('payment-container');
@@ -22,7 +24,6 @@ function handlePaidRegistration() {
     }
 
     function handleItemSelection() {
-        // Event listener untuk checkbox kategori lomba
         competitionItemsContainer.addEventListener('change', (e) => {
             if (e.target.classList.contains('checkout-checkbox')) {
                 const itemData = e.target.dataset;
@@ -35,7 +36,6 @@ function handlePaidRegistration() {
             }
         });
 
-        // Event listener untuk stepper merchandise
         merchandiseContainer.addEventListener('click', (e) => {
             if (e.target.classList.contains('stepper-btn')) {
                 const itemData = e.target.dataset;
@@ -51,7 +51,7 @@ function handlePaidRegistration() {
 
                 cart = cart.filter(ci => ci.quantity > 0);
                 const quantityElement = document.getElementById(`quantity-${itemId}`);
-                if(quantityElement) {
+                if (quantityElement) {
                     const updatedItem = cart.find(ci => ci.id === itemId && ci.type === 'merchandise');
                     quantityElement.textContent = updatedItem ? updatedItem.quantity : 0;
                 }
@@ -59,33 +59,15 @@ function handlePaidRegistration() {
             }
         });
     }
-    
-    function showPaymentPopup(details) {
-        const modalOverlay = document.createElement('div');
-        modalOverlay.className = 'modal-overlay';
-        const totalFormatted = Number(details.total).toLocaleString('id-ID');
-        modalOverlay.innerHTML = `
-            <div class="modal-content">
-                <h2>Instruksi Pembayaran</h2>
-                <div class="payment-info">
-                    <p>Silakan transfer sejumlah: <strong class="total-payment">Rp ${totalFormatted}</strong></p>
-                    <p>Jumlah tersebut sudah termasuk kode unik <strong>${details.kode_unik}</strong> untuk verifikasi.</p>
-                    <hr style="margin: 1rem 0;">
-                    <p>Ke nomor rekening berikut: <strong>${details.rekening}</strong></p>
-                </div>
-                <button id="confirm-and-close" class="btn-confirm-payment">Saya Mengerti, Lanjutkan</button>
-            </div>`;
-        document.body.appendChild(modalOverlay);
-        setTimeout(() => modalOverlay.classList.add('active'), 10);
-        document.getElementById('confirm-and-close').addEventListener('click', () => {
-            window.location.href = 'transactions.php';
-        });
-    }
 
     checkoutButton.addEventListener('click', function() {
-        if (cart.length === 0) return alert("Keranjang Anda kosong. Silakan pilih item terlebih dahulu.");
+        if (cart.length === 0) {
+            return Swal.fire('Keranjang Kosong', 'Silakan pilih item lomba atau merchandise terlebih dahulu.', 'warning');
+        }
         
         const checkoutData = { competition_id: competitionId, items: cart };
+        this.disabled = true;
+        this.textContent = 'Memproses...';
 
         fetch('api/process_checkout.php', {
             method: 'POST',
@@ -95,20 +77,45 @@ function handlePaidRegistration() {
         .then(response => response.json())
         .then(data => {
             if (data.status === 'success') {
-                showPaymentPopup(data.paymentDetails);
+                const totalFormatted = Number(data.paymentDetails.total).toLocaleString('id-ID');
+                Swal.fire({
+                    title: 'Instruksi Pembayaran',
+                    html: `
+                        <div style="text-align: left; padding: 0 1rem;">
+                            <p>Silakan transfer sejumlah:</p>
+                            <h3 style="color: var(--danger-color);">Rp ${totalFormatted}</h3>
+                            <p>Jumlah tersebut sudah termasuk kode unik <strong>${data.paymentDetails.kode_unik}</strong> untuk verifikasi.</p>
+                            <hr style="margin: 1rem 0;">
+                            <p>Ke nomor rekening berikut:</p>
+                            <strong>${data.paymentDetails.rekening}</strong>
+                        </div>`,
+                    icon: 'info',
+                    confirmButtonText: 'Saya Mengerti, Lanjutkan'
+                }).then(() => {
+                    window.location.href = 'transactions.php';
+                });
             } else {
-                alert(data.message);
+                Swal.fire('Checkout Gagal', data.message, 'error');
             }
-        }).catch(error => console.error('Error saat checkout:', error));
+        })
+        .catch(error => {
+            console.error('Error saat checkout:', error);
+            Swal.fire('Error', 'Tidak dapat terhubung ke server.', 'error');
+        })
+        .finally(() => {
+            this.disabled = false;
+            this.textContent = 'Selesaikan Pembayaran';
+        });
     });
 
     function loadPaymentOptions() {
-        if (!competitionId) return alert("ID Kompetisi tidak ditemukan.");
+        if (!competitionId) return Swal.fire('Error', 'ID Kompetisi tidak ditemukan di URL.', 'error');
         
         fetch(`api/get_payment_options.php?id=${competitionId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
+                    // ... (Kode untuk memuat item tetap sama)
                     data.data.competition_items.forEach(item => {
                         competitionItemsContainer.innerHTML += `
                             <div class="checkout-item">
@@ -145,15 +152,38 @@ function handleFreeRegistration() {
     const freeRegisForm = document.getElementById('free-regis-form');
     if (!freeRegisForm) return;
 
+    // Logika untuk pratinjau gambar
+    freeRegisForm.querySelectorAll('.file-input-requirement').forEach(input => {
+        input.addEventListener('change', function() {
+            const previewTargetId = this.dataset.previewTarget;
+            const previewContainer = document.getElementById(previewTargetId);
+            const previewImage = previewContainer.querySelector('img');
+
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    });
+
+    // Logika submit form
     freeRegisForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
         const urlParams = new URLSearchParams(window.location.search);
         const competitionId = urlParams.get('id');
-        if (!competitionId) return alert("ID kompetisi tidak ditemukan.");
+        if (!competitionId) return Swal.fire('Error', 'ID kompetisi tidak ditemukan.', 'error');
 
         const formData = new FormData(this);
         formData.append('competition_id', competitionId);
+        
+        const submitButton = this.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Mengirim...';
 
         fetch('api/submit_free_req.php', {
             method: 'POST',
@@ -161,14 +191,27 @@ function handleFreeRegistration() {
         })
         .then(response => response.json())
         .then(data => {
-            alert(data.message);
             if (data.status === 'success') {
-                window.location.href = 'transactions.php';
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Pendaftaran Berhasil!',
+                    text: 'Tim kami akan segera memvalidasi persyaratan Anda.',
+                    showConfirmButton: false,
+                    timer: 2000
+                }).then(() => {
+                    window.location.href = 'transactions.php';
+                });
+            } else {
+                Swal.fire('Gagal!', data.message || 'Terjadi kesalahan.', 'error');
             }
         })
         .catch(error => {
             console.error('Error saat submit pendaftaran gratis:', error);
-            alert("Terjadi kesalahan. Silakan coba lagi.");
+            Swal.fire('Error', 'Tidak dapat terhubung ke server.', 'error');
+        })
+        .finally(() => {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Submit Persyaratan';
         });
     });
 }

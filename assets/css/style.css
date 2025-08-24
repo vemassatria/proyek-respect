@@ -1550,3 +1550,22 @@ small { color: var(--text-light); }
     background: var(--warning-color);
 }
 
+.image-preview {
+    margin-top: 10px;
+    max-width: 200px;
+    border: 1px solid var(--border-color);
+    padding: 5px;
+    border-radius: 8px;
+}
+.image-preview img {
+    width: 100%;
+    display: block;
+    border-radius: 4px;
+}
+/* Style khusus untuk tombol upload bukti yang dinonaktifkan */
+.btn-upload-bukti.btn-disabled-custom {
+    background-color: #9ca3af; /* Warna abu-abu netral */
+    color: #f3f4f6; /* Teks putih pudar */
+    cursor: not-allowed; /* Ubah kursor untuk menandakan tidak bisa diklik */
+    border: none;
+}

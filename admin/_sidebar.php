@@ -20,9 +20,13 @@ $current_page = basename($_SERVER['SCRIPT_NAME']);
             <i class="fas fa-newspaper"></i>
             <span>Manajemen Berita</span>
         </a>
-        <a href="manage_transactions.php" class="nav-link <?php echo ($current_page == 'manage_transactions.php') ? 'active' : ''; ?>">
+        <a href="manage_transactions.php" class="nav-link ...">
             <i class="fas fa-file-invoice-dollar"></i>
             <span>Verifikasi Transaksi</span>
+        </a>
+        <a href="verify_free_registrations.php" class="nav-link <?php echo ($current_page == 'verify_free_registrations.php') ? 'active' : ''; ?>">
+            <i class="fas fa-check-double"></i>
+            <span>Verifikasi Gratis</span>
         </a>
         <a href="manage_users.php" class="nav-link <?php echo ($current_page == 'manage_users.php') ? 'active' : ''; ?>">
             <i class="fas fa-users"></i>

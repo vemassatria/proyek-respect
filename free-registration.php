@@ -19,20 +19,43 @@
             </header>
             <section class="requirement-list">
                 <div class="requirement-item">
-                    <div class="requirement-info"><h3>Follow Instagram @Respect.id_Indonesia</h3></div>
-                    <input type="file" name="req_follow" class="file-input-requirement" required>
+                    <div class="requirement-info">
+                        <h3>Follow Instagram @Respect.id_Indonesia</h3>
+                        <div class="image-preview" id="preview_follow" style="display:none;">
+                            <img src="" alt="Pratinjau Gambar">
+                        </div>
+                    </div>
+                    <input type="file" name="req_follow" class="file-input-requirement" data-preview-target="preview_follow" accept="image/*" required>
                 </div>
+
                 <div class="requirement-item">
-                    <div class="requirement-info"><h3>Share Poster Event Ke Instastory</h3></div>
-                    <input type="file" name="req_share" class="file-input-requirement" required>
+                    <div class="requirement-info">
+                        <h3>Share Poster Event Ke Instastory</h3>
+                        <div class="image-preview" id="preview_share" style="display:none;">
+                            <img src="" alt="Pratinjau Gambar">
+                        </div>
+                    </div>
+                    <input type="file" name="req_share" class="file-input-requirement" data-preview-target="preview_share" accept="image/*" required>
                 </div>
+
                 <div class="requirement-item">
-                    <div class="requirement-info"><h3>Ajak 5 Teman kamu di Poster Event</h3></div>
-                    <input type="file" name="req_invite" class="file-input-requirement" required>
+                    <div class="requirement-info">
+                        <h3>Ajak 5 Teman kamu di Poster Event</h3>
+                        <div class="image-preview" id="preview_invite" style="display:none;">
+                            <img src="" alt="Pratinjau Gambar">
+                        </div>
+                    </div>
+                    <input type="file" name="req_invite" class="file-input-requirement" data-preview-target="preview_invite" accept="image/*" required>
                 </div>
+
                 <div class="requirement-item">
-                    <div class="requirement-info"><h3>Subscribe Youtube Respect.id</h3></div>
-                    <input type="file" name="req_subscribe" class="file-input-requirement" required>
+                    <div class="requirement-info">
+                        <h3>Subscribe Youtube Respect.id</h3>
+                        <div class="image-preview" id="preview_subscribe" style="display:none;">
+                            <img src="" alt="Pratinjau Gambar">
+                        </div>
+                    </div>
+                    <input type="file" name="req_subscribe" class="file-input-requirement" data-preview-target="preview_subscribe" accept="image/*" required>
                 </div>
             </section>
             <button type="submit" class="btn-submit-requirement">Submit Persyaratan</button>
