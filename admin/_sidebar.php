@@ -11,11 +11,12 @@
             <i class="fas fa-trophy"></i>
             <span>Manajemen Lomba</span>
         </a>
-        <a href="manage_news.php" class="nav-link active"> <i class="fas fa-newspaper"></i>
+       <a href="manage_news.php" class="nav-link">
+            <i class="fas fa-newspaper"></i>
             <span>Manajemen Berita</span>
         </a>
-        <a href="#" class="nav-link">
-            <i class="fas fa-file-invoice-dollar"></i> <span>Verifikasi Transaksi</span>
+        <a href="manage_transactions.php" class="nav-link active"> <i class="fas fa-file-invoice-dollar"></i>
+            <span>Verifikasi Transaksi</span>
         </a>
         <a href="#" class="nav-link">
             <i class="fas fa-users"></i> <span>Manajemen Pengguna</span>

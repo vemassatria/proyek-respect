@@ -24,6 +24,10 @@ export function initAdmin() {
         loadNewsTable();
         setupNewsModal();
     }
+     if (document.getElementById('transactions-table')) {
+        loadTransactionsTable();
+        setupTransactionActions();
+    }
 }
 
 // --- BAGIAN AUTENTIKASI ---
@@ -426,6 +430,103 @@ function handleDeleteNews(id) {
                 if (data.status === 'success') {
                     Swal.fire('Terhapus!', data.message, 'success');
                     loadNewsTable();
+                } else {
+                    Swal.fire('Gagal!', data.message, 'error');
+                }
+            });
+        }
+    });
+}
+
+function loadTransactionsTable() {
+    const tableBody = document.querySelector('#transactions-table tbody');
+    if (!tableBody) return;
+    tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Memuat data...</td></tr>';
+
+    fetch('../api/admin_get_transactions.php')
+        .then(response => response.json())
+        .then(data => {
+            tableBody.innerHTML = '';
+            if (data.status === 'success' && data.data.length > 0) {
+                data.data.forEach(trx => {
+                    let statusClass = '';
+                    if (trx.payment_status === 'paid') statusClass = 'status-paid';
+                    if (trx.payment_status === 'pending_payment') statusClass = 'status-pending';
+                    if (trx.payment_status === 'Menunggu Validasi') statusClass = 'status-validating';
+                    if (trx.payment_status === 'rejected') statusClass = 'status-rejected';
+
+                    const row = `
+                        <tr>
+                            <td>${trx.transaction_code || `#${trx.id}`}</td>
+                            <td>${trx.user_name}</td>
+                            <td>${trx.competition_name}</td>
+                            <td>Rp ${Number(trx.amount).toLocaleString('id-ID')}</td>
+                            <td><span class="status-badge ${statusClass}">${trx.payment_status.replace('_', ' ')}</span></td>
+                            <td>
+                                ${trx.proof_path && trx.proof_path !== 'NULL' ? `<button class="btn-secondary btn-view-proof" data-proof="${trx.proof_path}">Lihat</button>` : 'N/A'}
+                            </td>
+                            <td class="action-buttons">
+                                ${trx.payment_status !== 'paid' ? `<button class="btn-icon btn-approve" data-id="${trx.id}" title="Setujui"><i class="fas fa-check"></i></button>` : ''}
+                                ${trx.payment_status !== 'rejected' ? `<button class="btn-icon btn-reject" data-id="${trx.id}" title="Tolak"><i class="fas fa-times"></i></button>` : ''}
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            } else {
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Tidak ada transaksi.</td></tr>';
+            }
+        });
+}
+
+function setupTransactionActions() {
+    const table = document.getElementById('transactions-table');
+    const modal = document.getElementById('proof-modal');
+    const closeModalBtn = document.getElementById('close-proof-modal-btn');
+    const proofImage = document.getElementById('proof-image');
+
+    if (!table || !modal) return;
+    
+    const closeModal = () => modal.style.display = 'none';
+    closeModalBtn.addEventListener('click', closeModal);
+
+    table.addEventListener('click', function(event) {
+        const target = event.target.closest('button');
+        if (!target) return;
+
+        const id = target.dataset.id;
+        
+        if (target.classList.contains('btn-view-proof')) {
+            proofImage.src = `../uploads/proofs/${target.dataset.proof}`;
+            modal.style.display = 'flex';
+        } else if (target.classList.contains('btn-approve')) {
+            updateTransactionStatus(id, 'paid');
+        } else if (target.classList.contains('btn-reject')) {
+            updateTransactionStatus(id, 'rejected');
+        }
+    });
+}
+
+function updateTransactionStatus(id, status) {
+    const actionText = status === 'paid' ? 'menyetujui' : 'menolak';
+    Swal.fire({
+        title: `Anda yakin ingin ${actionText} transaksi ini?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Lanjutkan',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('../api/admin_update_transaction_status.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: id, status: status })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire('Berhasil!', data.message, 'success');
+                    loadTransactionsTable();
                 } else {
                     Swal.fire('Gagal!', data.message, 'error');
                 }
