@@ -17,8 +17,15 @@ export function initAccount() {
  */
 function loadProfileData() {
     fetch('api/get_profile.php')
-        .then(response => response.json())
+        .then(response => {
+            // Cek jika respons dari server adalah error (spt 404 atau 500)
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            // Cek status dari JSON yang dikirim oleh API PHP
             if (data.status === 'success') {
                 const profile = data.data;
                 
@@ -39,7 +46,20 @@ function loadProfileData() {
                 updateDocumentUI('cv', profile.cv_path);
                 updateDocumentUI('portfolio', profile.portfolio_path);
                 updateDocumentUI('ktm', profile.ktm_path);
+            } else {
+                // Jika status dari API adalah 'error' (misal: "Akses ditolak")
+                throw new Error(data.message || 'Gagal memuat data profil.');
             }
+        })
+        .catch(error => {
+            // Blok ini akan menangkap semua jenis error (jaringan atau dari API)
+            console.error('Error saat memuat profil:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: `Tidak dapat memuat data akun Anda. Penyebab: ${error.message}`,
+                footer: 'Silakan coba login kembali atau hubungi administrator.'
+            });
         });
 }
 
@@ -190,7 +210,7 @@ function updateDocumentUI(docType, filePath) {
     const deleteBtn = row.querySelector('.btn-delete');
 
     if (filePath) {
-        statusEl.innerHTML = `<a href="uploads/documents/${filePath}" target="_blank">Tersimpan. Klik untuk melihat.</a>`;
+        statusEl.innerHTML = `<a href="api/view_document.php?file=${filePath}" target="_blank">Tersimpan. Klik untuk melihat.</a>`;
         uploadBtn.textContent = 'Ganti';
         deleteBtn.style.display = 'inline-block';
     } else {
