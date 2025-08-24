@@ -9,30 +9,36 @@
 // --- FUNGSI GLOBAL & UTAMA ---
 
 export function initAdmin() {
-    // Panggil fungsi-fungsi lain yang sudah ada
-    handleAdminLoginForm();
+    // Fungsi yang berjalan di semua halaman admin
     handleAdminLogout();
+    handleAdminLoginForm();
 
-    // Tentukan halaman mana yang aktif dan panggil fungsi yang sesuai
+    // Jalankan fungsi spesifik berdasarkan halaman yang aktif
     const currentPage = window.location.pathname.split("/").pop();
 
-    if (currentPage === 'dashboard.php') {
-        loadDashboardStats();
-    }
-    if (currentPage === 'manage_competitions.php') {
-        loadCompetitionsTable();
-        setupCompetitionModal();
-    }
-    if (currentPage === 'manage_news.php') {
-        // Panggil fungsi berita di sini nanti
-    }
-    if (currentPage === 'manage_transactions.php') {
-        loadTransactionsTable();
-        setupTransactionActions();
-    }
-    if (currentPage === 'manage_users.php') {
-        loadUsersTable();
-        setupUserActions();
+    switch (currentPage) {
+        case 'dashboard.php':
+            loadDashboardStats();
+            break;
+        case 'manage_competitions.php':
+            loadCompetitionsTable();
+            setupCompetitionModal();
+            break;
+        case 'manage_news.php':
+            loadNewsTable();
+            setupNewsModal();
+            break;
+        case 'manage_transactions.php':
+            loadTransactionsTable();
+            setupTransactionActions();
+            break;
+        case 'manage_users.php':
+            loadUsersTable();
+            setupUserActions();
+            break;
+        case 'verify_free_registrations.php':
+            loadFreeVerifications();
+            break;
     }
 }
 
@@ -54,9 +60,6 @@ function handleAdminLoginForm() {
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // SEGERA LAKUKAN REDIRECT SETELAH SUKSES
-                    // Tidak perlu notifikasi atau jeda.
-                    // Baris inilah yang membuat redirect terjadi secara langsung.
                     window.location.href = 'dashboard.php';
 
                 } else {
@@ -115,12 +118,11 @@ function handleAdminLogout() {
 }
 
 
-// --- BAGIAN MANAJEMEN LOMBA ---
+// --- BAGIAN MANAJEMEN LOMBA (VERSI PERBAIKAN) ---
 
 function loadCompetitionsTable() {
     const tableBody = document.querySelector('#competitions-table tbody');
     if (!tableBody) return;
-
     tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr>';
 
     fetch('../api/admin_get_competitions.php')
@@ -150,25 +152,34 @@ function loadCompetitionsTable() {
         .catch(error => {
             console.error('Error fetching competitions:', error);
             tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Gagal memuat data.</td></tr>';
-        })
-        .finally(() => {
-            addCompetitionTableEventListeners();
         });
 }
 
 function setupCompetitionModal() {
     const modal = document.getElementById('competition-modal');
     const form = document.getElementById('competition-form');
+    // Perbaikan Kritis: Tambahkan '#' pada selector
     const openModalBtn = document.querySelector('#add-competition-btn');
     const closeModalBtn = document.getElementById('close-modal-btn');
     const cancelBtn = document.getElementById('cancel-btn');
+    const table = document.querySelector('#competitions-table');
 
-    if (!modal || !openModalBtn || !closeModalBtn || !form) return;
+    if (!modal || !openModalBtn || !form || !table) return;
 
-    const openModal = () => {
+    // Fungsi untuk membuka modal (bisa untuk Tambah atau Edit)
+    const openModal = (isEdit = false, data = {}) => {
         form.reset();
-        document.getElementById('competition_id').value = '';
-        document.getElementById('modal-title').textContent = 'Tambah Lomba Baru';
+        document.getElementById('competition_id').value = isEdit ? data.id : '';
+        document.getElementById('modal-title').textContent = isEdit ? `Edit Lomba #${data.id}` : 'Tambah Lomba Baru';
+        
+        if (isEdit) {
+            // Isi form dengan data yang ada
+            document.getElementById('nama_lomba').value = data.nama_lomba;
+            document.getElementById('deskripsi').value = data.deskripsi;
+            document.getElementById('tanggal_mulai_daftar').value = data.tanggal_mulai_daftar;
+            document.getElementById('tanggal_akhir_daftar').value = data.tanggal_akhir_daftar;
+            document.getElementById('biaya').value = parseFloat(data.biaya);
+        }
         modal.style.display = 'flex';
     };
 
@@ -176,13 +187,38 @@ function setupCompetitionModal() {
         modal.style.display = 'none';
     };
 
-    openModalBtn.addEventListener('click', openModal);
+    // Event listener untuk tombol utama "Tambah Lomba Baru"
+    openModalBtn.addEventListener('click', () => openModal(false));
+    
+    // Event listener untuk menutup modal
     closeModalBtn.addEventListener('click', closeModal);
     cancelBtn.addEventListener('click', closeModal);
     window.addEventListener('click', (event) => {
         if (event.target === modal) closeModal();
     });
 
+    // SATU event listener untuk semua aksi di dalam tabel (Edit & Hapus)
+    table.addEventListener('click', function(event) {
+        const target = event.target.closest('button');
+        if (!target) return;
+        const id = target.dataset.id;
+
+        if (target.classList.contains('btn-edit-comp')) {
+            fetch(`../api/admin_get_competition_detail.php?id=${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        openModal(true, data.data); // Buka modal dalam mode Edit
+                    } else {
+                        Swal.fire('Gagal!', 'Data lomba tidak ditemukan.', 'error');
+                    }
+                });
+        } else if (target.classList.contains('btn-delete-comp')) {
+            handleDeleteCompetition(id);
+        }
+    });
+
+    // Event listener untuk submit form (menangani Tambah dan Update sekaligus)
     form.addEventListener('submit', function(event) {
         event.preventDefault();
         const formData = new FormData(this);
@@ -194,70 +230,28 @@ function setupCompetitionModal() {
         submitButton.textContent = 'Menyimpan...';
 
         fetch(apiUrl, { method: 'POST', body: formData })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                Swal.fire('Berhasil!', data.message, 'success');
-                closeModal();
-                loadCompetitionsTable();
-            } else {
-                Swal.fire('Gagal!', data.message, 'error');
-            }
-        })
-        .catch(error => Swal.fire('Error', 'Terjadi kesalahan pada jaringan.', 'error'))
-        .finally(() => {
-            submitButton.disabled = false;
-            submitButton.textContent = 'Simpan';
-        });
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire('Berhasil!', data.message, 'success');
+                    closeModal();
+                    loadCompetitionsTable();
+                } else {
+                    Swal.fire('Gagal!', data.message || 'Terjadi kesalahan.', 'error');
+                }
+            })
+            .catch(error => Swal.fire('Error', 'Terjadi kesalahan pada jaringan.', 'error'))
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Simpan';
+            });
     });
-}
-
-function addCompetitionTableEventListeners() {
-    const table = document.querySelector('#competitions-table');
-    if (!table) return;
-
-    table.addEventListener('click', function(event) {
-        const target = event.target.closest('button');
-        if (!target) return;
-
-        const id = target.dataset.id;
-
-        if (target.classList.contains('btn-edit-comp')) {
-            openCompetitionModalForEdit(id);
-        } else if (target.classList.contains('btn-delete-comp')) {
-            handleDeleteCompetition(id);
-        }
-    });
-}
-
-function openCompetitionModalForEdit(id) {
-    fetch(`../api/admin_get_competition_detail.php?id=${id}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                const comp = data.data;
-                const form = document.getElementById('competition-form');
-                form.reset();
-                
-                document.getElementById('competition_id').value = comp.id;
-                document.getElementById('nama_lomba').value = comp.nama_lomba;
-                document.getElementById('deskripsi').value = comp.deskripsi;
-                document.getElementById('tanggal_mulai_daftar').value = comp.tanggal_mulai_daftar;
-                document.getElementById('tanggal_akhir_daftar').value = comp.tanggal_akhir_daftar;
-                document.getElementById('biaya').value = parseFloat(comp.biaya);
-                
-                document.getElementById('modal-title').textContent = 'Edit Lomba';
-                document.getElementById('competition-modal').style.display = 'flex';
-            } else {
-                Swal.fire('Gagal!', 'Tidak dapat memuat data lomba.', 'error');
-            }
-        });
 }
 
 function handleDeleteCompetition(id) {
     Swal.fire({
         title: 'Anda Yakin?',
-        text: "Data lomba ini akan dihapus permanen!",
+        text: "Data ini akan dihapus permanen!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -283,14 +277,11 @@ function handleDeleteCompetition(id) {
         }
     });
 }
-
-
-// --- BAGIAN MANAJEMEN BERITA ---
+// --- BAGIAN MANAJEMEN BERITA (VERSI PERBAIKAN) ---
 
 function loadNewsTable() {
     const tableBody = document.querySelector('#news-table tbody');
     if (!tableBody) return;
-
     tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr>';
 
     fetch('../api/admin_get_news.php')
@@ -320,9 +311,6 @@ function loadNewsTable() {
         .catch(error => {
             console.error('Error fetching news:', error);
             tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Gagal memuat data.</td></tr>';
-        })
-        .finally(() => {
-            addNewsTableEventListeners();
         });
 }
 
@@ -332,13 +320,22 @@ function setupNewsModal() {
     const openModalBtn = document.getElementById('add-news-btn');
     const closeModalBtn = document.getElementById('close-news-modal-btn');
     const cancelBtn = document.getElementById('cancel-news-btn');
+    const table = document.getElementById('news-table');
 
-    if (!modal || !openModalBtn || !closeModalBtn || !form) return;
+    if (!modal || !openModalBtn || !form || !table) return;
 
-    const openModal = () => {
+    // Fungsi terpusat untuk membuka modal
+    const openModal = (isEdit = false, data = {}) => {
         form.reset();
-        document.getElementById('news_id').value = '';
-        document.getElementById('news-modal-title').textContent = 'Tambah Berita Baru';
+        document.getElementById('news_id').value = isEdit ? data.id : '';
+        document.getElementById('news-modal-title').textContent = isEdit ? `Edit Berita #${data.id}` : 'Tambah Berita Baru';
+        
+        if (isEdit) {
+            document.getElementById('title').value = data.title;
+            document.getElementById('article_link').value = data.article_link;
+            document.getElementById('category').value = data.category;
+            document.getElementById('is_featured').value = data.is_featured;
+        }
         modal.style.display = 'flex';
     };
 
@@ -346,71 +343,63 @@ function setupNewsModal() {
         modal.style.display = 'none';
     };
 
-    openModalBtn.addEventListener('click', openModal);
+    // Event listener untuk tombol "Tambah Berita Baru"
+    openModalBtn.addEventListener('click', () => openModal(false));
+    
+    // Event listener untuk menutup modal
     closeModalBtn.addEventListener('click', closeModal);
     cancelBtn.addEventListener('click', closeModal);
     window.addEventListener('click', (event) => {
         if (event.target === modal) closeModal();
     });
 
+    // SATU event listener untuk semua aksi di dalam tabel
+    table.addEventListener('click', function(event) {
+        const target = event.target.closest('button');
+        if (!target) return;
+        
+        const id = target.dataset.id;
+        if (target.classList.contains('btn-edit-news')) {
+            fetch(`../api/admin_get_news_detail.php?id=${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        openModal(true, data.data);
+                    } else {
+                        Swal.fire('Gagal!', 'Data berita tidak ditemukan.', 'error');
+                    }
+                });
+        } else if (target.classList.contains('btn-delete-news')) {
+            handleDeleteNews(id);
+        }
+    });
+
+    // Event listener untuk submit form (menangani Tambah & Update)
     form.addEventListener('submit', function(event) {
         event.preventDefault();
         const formData = new FormData(this);
         const newsId = formData.get('news_id');
         const apiUrl = newsId ? '../api/admin_update_news.php' : '../api/admin_add_news.php';
         
+        const submitButton = this.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Menyimpan...';
+
         fetch(apiUrl, { method: 'POST', body: formData })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                Swal.fire('Berhasil!', data.message, 'success');
-                closeModal();
-                loadNewsTable();
-            } else {
-                Swal.fire('Gagal!', data.message, 'error');
-            }
-        });
-    });
-}
-
-function addNewsTableEventListeners() {
-    const table = document.getElementById('news-table');
-    if (!table) return;
-
-    table.addEventListener('click', function(event) {
-        const target = event.target.closest('button');
-        if (!target) return;
-        
-        const id = target.dataset.id;
-
-        if (target.classList.contains('btn-edit-news')) {
-            openNewsModalForEdit(id);
-        } else if (target.classList.contains('btn-delete-news')) {
-            handleDeleteNews(id);
-        }
-    });
-}
-
-function openNewsModalForEdit(id) {
-    fetch(`../api/admin_get_news_detail.php?id=${id}`)
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === 'success') {
-            const news = data.data;
-            const form = document.getElementById('news-form');
-            form.reset();
-            
-            document.getElementById('news_id').value = news.id;
-            document.getElementById('title').value = news.title;
-            document.getElementById('article_link').value = news.article_link;
-            document.getElementById('category').value = news.category;
-            document.getElementById('is_featured').value = news.is_featured;
-            
-            document.getElementById('news-modal-title').textContent = 'Edit Berita';
-            document.getElementById('news-modal').style.display = 'flex';
-        } else {
-            Swal.fire('Gagal!', 'Tidak dapat memuat data berita.', 'error');
-        }
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire('Berhasil!', data.message, 'success');
+                    closeModal();
+                    loadNewsTable();
+                } else {
+                    Swal.fire('Gagal!', data.message || 'Terjadi kesalahan.', 'error');
+                }
+            })
+            .finally(() => {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Simpan';
+            });
     });
 }
 
@@ -513,7 +502,7 @@ function setupTransactionActions() {
     });
 }
 
-function updateTransactionStatus(id, status) {
+function updateTransactionStatus(id, status, callback) {
     const actionText = status === 'paid' ? 'menyetujui' : 'menolak';
     Swal.fire({
         title: `Anda yakin ingin ${actionText} transaksi ini?`,
@@ -532,7 +521,7 @@ function updateTransactionStatus(id, status) {
             .then(data => {
                 if (data.status === 'success') {
                     Swal.fire('Berhasil!', data.message, 'success');
-                    loadTransactionsTable();
+                    if (callback) callback();
                 } else {
                     Swal.fire('Gagal!', data.message, 'error');
                 }
@@ -541,7 +530,75 @@ function updateTransactionStatus(id, status) {
     });
 }
 
-// ... (kode fungsi sebelumnya)
+function loadFreeVerifications() {
+    const container = document.getElementById('verification-list');
+    if (!container) return;
+    container.innerHTML = '<p style="text-align:center;">Memuat pendaftaran...</p>';
+
+    fetch('../api/admin_get_free_registrations.php')
+        .then(res => res.json())
+        .then(data => {
+            container.innerHTML = '';
+            if (data.status === 'success' && data.data.length > 0) {
+                data.data.forEach(reg => {
+                    // Membuat daftar bukti untuk setiap pendaftaran
+                    let proofsHTML = reg.proofs.map(p => `
+                        <div class="proof-item">
+                            <strong>${p.requirement_type.replace('req_', '')}:</strong>
+                            <a href="../uploads/documents/${p.proof_path}" target="_blank" class="proof-link">Lihat Bukti</a>
+                        </div>
+                    `).join('');
+
+                    const card = `
+                        <div class="verification-card">
+                            <div class="verification-header">
+                                <span>ID Pendaftaran: <strong>#${reg.id}</strong></span>
+                                <span>${reg.user_name} - <i>${reg.nama_lomba}</i></span>
+                            </div>
+                            <div class="verification-body">
+                                ${proofsHTML}
+                            </div>
+                            <div class="verification-footer">
+                                <button class="btn-secondary btn-reject-free" data-id="${reg.id}">Tolak</button>
+                                <button class="btn-primary btn-approve-free" data-id="${reg.id}">Setujui</button>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += card;
+                });
+                
+                // Pasang event listener untuk tombol Setujui/Tolak
+                setupFreeVerificationActions();
+
+            } else {
+                container.innerHTML = '<p style="text-align:center;">Tidak ada pendaftaran gratis yang perlu diverifikasi saat ini.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching free registrations:', error);
+            container.innerHTML = '<p style="text-align:center; color: red;">Gagal memuat data.</p>';
+        });
+}
+
+function setupFreeVerificationActions() {
+    const container = document.getElementById('verification-list');
+    if (!container) return;
+
+    container.addEventListener('click', function(event) {
+        const target = event.target.closest('button');
+        if (!target) return;
+
+        const id = target.dataset.id;
+        if (target.classList.contains('btn-approve-free')) {
+            // Kita gunakan API yang sama dengan verifikasi transaksi biasa
+            updateTransactionStatus(id, 'paid', loadFreeVerifications); // 'paid' menandakan terverifikasi
+        } else if (target.classList.contains('btn-reject-free')) {
+            updateTransactionStatus(id, 'rejected', loadFreeVerifications);
+        }
+    });
+}
+
+//usersss//
 
 function loadUsersTable() {
     const tableBody = document.querySelector('#users-table tbody');

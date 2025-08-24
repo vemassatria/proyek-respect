@@ -27,23 +27,44 @@ function loadTransactions() {
 
 function createTransactionRow(trx) {
     let statusHTML = '';
-    let buttonState = 'disabled';
+    let buttonHTML = '';
 
-    if (trx.payment_status === 'paid') {
-        statusHTML = `<div class="status-paid"><span>Paid</span><div class="progress-bar"><div class="progress" style="width: 100%;"></div></div></div>`;
-    } else if (trx.payment_status === 'Menunggu Validasi') {
-        statusHTML = `<div class="status-validating"><span>Menunggu Validasi</span><div class="progress-bar"><div class="progress" style="width: 50%;"></div></div></div>`;
-    } else { // 'pending_payment'
-        statusHTML = `<div class="status-no-paid"><span>No Paid</span><div class="progress-bar"><div class="progress" style="width: 10%;"></div></div><small>Segera bayar</small></div>`;
-        buttonState = ''; // Aktifkan tombol hanya untuk status ini
+    const isFree = trx.transaction_code && trx.transaction_code.startsWith('FREE-');
+
+    if (isFree) {
+        // Logika status untuk pendaftaran gratis (sudah benar)
+        if (trx.payment_status === 'Menunggu Validasi') {
+            statusHTML = `<div class="status-validating"><span>Menunggu Validasi</span><div class="progress-bar"><div class="progress" style="width: 50%;"></div></div></div>`;
+        } else if (trx.payment_status === 'paid') {
+            statusHTML = `<div class="status-paid"><span>Terverifikasi</span><div class="progress-bar"><div class="progress" style="width: 100%;"></div></div></div>`;
+        } else { // rejected
+             statusHTML = `<div class="status-no-paid"><span>Ditolak</span><div class="progress-bar"><div class="progress" style="width: 10%;"></div></div></div>`;
+        }
+        // Tambahkan kelas 'btn-disabled-custom'
+        buttonHTML = `<button class="btn-upload-bukti btn-disabled-custom" disabled>Pendaftaran Gratis</button>`;
+
+    } else {
+        // Logika untuk pendaftaran berbayar (sudah benar)
+        if (trx.payment_status === 'paid') {
+            statusHTML = `<div class="status-paid"><span>Paid</span><div class="progress-bar"><div class="progress" style="width: 100%;"></div></div></div>`;
+            // Tambahkan kelas 'btn-disabled-custom'
+            buttonHTML = `<button class="btn-upload-bukti btn-disabled-custom" disabled>Sudah Dibayar</button>`;
+        } else if (trx.payment_status === 'Menunggu Validasi') {
+            statusHTML = `<div class="status-validating"><span>Menunggu Validasi</span><div class="progress-bar"><div class="progress" style="width: 50%;"></div></div></div>`;
+            // Tambahkan kelas 'btn-disabled-custom'
+            buttonHTML = `<button class="btn-upload-bukti btn-disabled-custom" disabled>Menunggu Validasi</button>`;
+        } else { // 'pending_payment'
+            statusHTML = `<div class="status-no-paid"><span>Belum Dibayar</span><div class="progress-bar"><div class="progress" style="width: 10%;"></div></div><small>Segera bayar</small></div>`;
+            buttonHTML = `<button class="btn-upload-bukti" data-trx-id="${trx.id}">Upload Bukti</button>`;
+        }
     }
 
     return `
         <div class="transaction-row">
-            <div>#${trx.transaction_code || trx.id}</div>
+            <div>${trx.transaction_code || '#' + trx.id}</div>
             <div>${trx.nama_lomba}</div>
-            <div><button class="btn-upload-bukti" data-trx-id="${trx.id}" ${buttonState}>Upload Bukti</button></div>
-            <div>Rp. ${Number(trx.amount || 0).toLocaleString('id-ID')}</div>
+            <div>${buttonHTML}</div>
+            <div>Rp ${Number(trx.amount || 0).toLocaleString('id-ID')}</div>
             <div class="status-cell">${statusHTML}</div>
         </div>`;
 }

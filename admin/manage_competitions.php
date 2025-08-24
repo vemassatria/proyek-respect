@@ -8,7 +8,7 @@ include '_sidebar.php'; // Memanggil sidebar dan header utama
 <div class="content-card">
     <div class="toolbar">
         <h4>Daftar Lomba</h4>
-        <button class="btn-primary">
+        <button id="add-competition-btn" class="btn-primary">
             <i class="fas fa-plus"></i> Tambah Lomba Baru
         </button>
     </div>
