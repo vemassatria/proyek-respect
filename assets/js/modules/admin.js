@@ -9,28 +9,30 @@
 // --- FUNGSI GLOBAL & UTAMA ---
 
 export function initAdmin() {
-    // Fungsi yang berjalan di semua halaman admin
+    // Panggil fungsi-fungsi lain yang sudah ada
+    handleAdminLoginForm();
     handleAdminLogout();
 
-    // Fungsi spesifik per halaman
-    if (document.getElementById('adminLoginForm')) {
-        handleAdminLoginForm();
+    // Tentukan halaman mana yang aktif dan panggil fungsi yang sesuai
+    const currentPage = window.location.pathname.split("/").pop();
+
+    if (currentPage === 'dashboard.php') {
+        loadDashboardStats();
     }
-    if (document.getElementById('competitions-table')) {
+    if (currentPage === 'manage_competitions.php') {
         loadCompetitionsTable();
         setupCompetitionModal();
     }
-    if (document.getElementById('news-table')) {
-        loadNewsTable();
-        setupNewsModal();
+    if (currentPage === 'manage_news.php') {
+        // Panggil fungsi berita di sini nanti
     }
-     if (document.getElementById('transactions-table')) {
+    if (currentPage === 'manage_transactions.php') {
         loadTransactionsTable();
         setupTransactionActions();
     }
-     if (document.getElementById('users-table')) {
+    if (currentPage === 'manage_users.php') {
         loadUsersTable();
-        setupUserActions(); // <-- BARU: Memanggil fungsi untuk event listener tabel user
+        setupUserActions();
     }
 }
 
@@ -637,4 +639,35 @@ function handleChangeUserRole(userId, currentRole) {
             });
         }
     });
+}
+function loadDashboardStats() {
+    const statsContainer = document.querySelector('.dashboard-stats');
+    if (!statsContainer) return;
+
+    fetch('../api/admin_get_dashboard_stats.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const stats = data.data;
+
+                // Update kartu Total Pengguna
+                statsContainer.querySelector('.stat-card:nth-child(1) span').textContent = stats.total_users;
+                
+                // Update kartu Total Lomba
+                statsContainer.querySelector('.stat-card:nth-child(2) span').textContent = stats.total_competitions;
+
+                // Update kartu Transaksi Pending
+                statsContainer.querySelector('.stat-card:nth-child(3) span').textContent = stats.pending_transactions;
+
+                // Update kartu Total Pendapatan
+                const revenue = Number(stats.total_revenue).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 });
+                statsContainer.querySelector('.stat-card:nth-child(4) span').textContent = revenue;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching dashboard stats:', error);
+            statsContainer.querySelectorAll('.stat-info span').forEach(span => {
+                span.textContent = 'Error';
+            });
+        });
 }
