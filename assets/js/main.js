@@ -11,24 +11,38 @@ import { initPayment } from './modules/payment.js';
 import { initTransactions } from './modules/transactions.js';
 import { initHistory } from './modules/history.js';
 import { initNews } from './modules/news.js';
-// Perbaiki baris import di bawah ini
+import { initAdmin } from './modules/admin.js'; // <-- BARU: Impor modul admin
 import { protectRoutes, handleLogout, loadUserData, setActiveNavLink, handleDynamicBackButton } from './modules/shared.js';
 
 // Jalankan semua skrip setelah DOM selesai dimuat
 document.addEventListener("DOMContentLoaded", function() {
-    
+
+    const currentPath = window.location.pathname;
+
+    // --- LOGIKA BARU UNTUK MEMISAHKAN ADMIN DAN USER ---
+    // Cek apakah kita berada di dalam folder admin
+    if (currentPath.includes('/admin/')) {
+        initAdmin(); // Jalankan hanya skrip untuk admin
+        return;      // Hentikan eksekusi agar skrip user tidak berjalan
+    }
+    // ----------------------------------------------------
+
+
+    // --- Skrip untuk halaman PENGGUNA (USER) ---
     if (!protectRoutes()) {
-        return;
+        return; // Hentikan jika pengguna belum login dan mencoba akses halaman terproteksi
     }
 
+    // Jalankan fungsi global untuk halaman pengguna
     handleDynamicBackButton();
-    // Jalankan fungsi global
-    setActiveNavLink(); // Ini akan mengaktifkan link navbar
+    setActiveNavLink();
     handleLogout();
-    loadUserData(); 
+    loadUserData();
 
-    const page = window.location.pathname.split("/").pop() || 'index.php';
+    // Dapatkan nama file halaman saat ini
+    const page = currentPath.split("/").pop() || 'index.php';
 
+    // Jalankan inisialisasi modul berdasarkan halaman yang aktif
     switch(page) {
         case 'login.php':
         case 'register.php':
