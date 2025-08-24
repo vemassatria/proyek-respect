@@ -367,3 +367,27 @@ body {
 
 .btn-icon.btn-approve { color: #10b981; }
 .btn-icon.btn-reject { color: #ef4444; }
+
+/* Role Badge Styles */
+.role-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: capitalize;
+}
+.role-badge.role-admin {
+    background-color: #ef4444;
+    color: white;
+}
+.role-badge.role-user {
+    background-color: #64748b;
+    color: white;
+}
+
+.btn-icon.btn-view-user {
+    color: #3b82f6;
+}
+.btn-icon.btn-edit-role {
+    color: #8b5cf6; /* Warna ungu */
+}
