@@ -28,6 +28,10 @@ export function initAdmin() {
         loadTransactionsTable();
         setupTransactionActions();
     }
+     if (document.getElementById('users-table')) {
+        loadUsersTable();
+        setupUserActions(); // <-- BARU: Memanggil fungsi untuk event listener tabel user
+    }
 }
 
 // --- BAGIAN AUTENTIKASI ---
@@ -530,6 +534,106 @@ function updateTransactionStatus(id, status) {
                 } else {
                     Swal.fire('Gagal!', data.message, 'error');
                 }
+            });
+        }
+    });
+}
+
+// ... (kode fungsi sebelumnya)
+
+function loadUsersTable() {
+    const tableBody = document.querySelector('#users-table tbody');
+    if (!tableBody) return;
+    tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Memuat data pengguna...</td></tr>';
+
+    fetch('../api/admin_get_users.php')
+        .then(response => response.json())
+        .then(data => {
+            tableBody.innerHTML = '';
+            if (data.status === 'success' && data.data.length > 0) {
+                data.data.forEach(user => {
+                    // BARU: Menambahkan tombol Ubah Role
+                    const row = `
+                        <tr>
+                            <td>${user.id}</td>
+                            <td>${user.nama}</td>
+                            <td>${user.email}</td>
+                            <td>${user.tingkatan || 'N/A'}</td>
+                            <td>${user.institusi || 'N/A'}</td>
+                            <td><span class="role-badge role-${user.role}">${user.role}</span></td>
+                            <td class="action-buttons">
+                                <button class="btn-icon btn-view-user" data-id="${user.id}" title="Lihat Detail"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon btn-edit-role" data-id="${user.id}" data-current-role="${user.role}" title="Ubah Role"><i class="fas fa-user-shield"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                    tableBody.innerHTML += row;
+                });
+            } else {
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Tidak ada pengguna terdaftar.</td></tr>';
+            }
+        });
+}
+function setupUserActions() {
+    const tableBody = document.querySelector('#users-table tbody');
+    if (!tableBody) return;
+
+    tableBody.addEventListener('click', function(event) {
+        const target = event.target.closest('button');
+        if (!target) return;
+
+        const userId = target.dataset.id;
+
+        if (target.classList.contains('btn-edit-role')) {
+            const currentRole = target.dataset.currentRole;
+            handleChangeUserRole(userId, currentRole);
+        }
+        // Aksi lain seperti 'Lihat Detail' bisa ditambahkan di sini
+    });
+}
+
+// FUNGSI BARU: Untuk proses ubah role
+function handleChangeUserRole(userId, currentRole) {
+    Swal.fire({
+        title: 'Ubah Role Pengguna',
+        html: `Pilih role baru untuk pengguna ID: <strong>${userId}</strong>`,
+        input: 'select',
+        inputOptions: {
+            'user': 'User',
+            'admin': 'Admin'
+        },
+        inputValue: currentRole,
+        showCancelButton: true,
+        confirmButtonText: 'Simpan Perubahan',
+        cancelButtonText: 'Batal',
+        inputValidator: (value) => {
+            if (!value) {
+                return 'Anda perlu memilih sebuah role!'
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const newRole = result.value;
+            fetch('../api/admin_update_user_role.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: userId, new_role: newRole })
+            })
+            .then(response => {
+                // Penanganan error yang lebih baik
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.message) });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    Swal.fire('Berhasil!', data.message, 'success');
+                    loadUsersTable(); // Muat ulang tabel untuk melihat perubahan
+                }
+            })
+            .catch(error => {
+                Swal.fire('Gagal!', error.message, 'error');
             });
         }
     });
