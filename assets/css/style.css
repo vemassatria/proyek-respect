@@ -10,6 +10,7 @@
     --off-white: #f1ece6;
     --font-white: #ffffff;
     --font-black: #000000;
+    --background-main: #d5e2eb;
 
     /* Penerapan ke Variabel Sistem */
     --primary-color: var(--dark-blue);
@@ -51,7 +52,7 @@ body {
     font-family: var(--font-main);
     line-height: 1.6;
     color: var(--text-dark);
-    background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+    background-color: var(--background-main);
     min-height: 100vh;
     overflow-x: hidden;
 }
@@ -98,7 +99,7 @@ body {
 }
 
 .register-card {
-    background: var(--background-card);
+    background: var(--off-white);
     backdrop-filter: blur(10px);
     border-radius: 32px;
     padding: 2rem;
@@ -119,7 +120,7 @@ body {
 .register-form {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .form-group {
@@ -376,6 +377,7 @@ body {
     }
     .transaction-table {
     font-size: 0.8rem; /* Perkecil ukuran font di dalam tabel */
+    background-color: var(--off-white);
     padding: 0.5rem;   /* Kurangi padding di sekitar tabel */
     }
     .transaction-header, .transaction-row {
@@ -408,6 +410,7 @@ body {
         max-width: 100%;
         border-top-left-radius: 10px;
         border-top-right-radius: 20px;
+        background-color: var(--primary-color);
     }
 
 }
@@ -503,7 +506,7 @@ body {
 
 /* === ACCOUNT PAGE STYLES === */
 .account-card {
-    background: var(--white);
+    background: var(--off-white);
     border-radius: 24px;
     padding: 2rem;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
@@ -764,7 +767,7 @@ body {
 .event-card {
     width: 350px;       /* Beri lebar tetap pada setiap kartu */
     flex-shrink: 0;     /* Mencegah kartu 'gepeng' atau menyusut */
-    background: var(--white);
+    background: var(--off-white);
     border-radius: 20px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     overflow: hidden;
@@ -846,7 +849,7 @@ body {
 .transaction-table {
     width: 100%;
     max-width: 1200px;
-    background: var(--white);
+    background: var(--off-white);
     border-radius: 12px;
     padding: 1rem;
     font-size: 0.9rem;
@@ -887,19 +890,21 @@ small { color: var(--text-light); }
 
 /* === HISTORY PAGE STYLES === */
 .history-list {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     flex-direction: column;
     gap: 1.5rem;
     width: 100%;
-    max-width: 600px;
+    max-width: 80vw;
 }
 .history-card {
-    background-color: var(--primary-color);
-    color: var(--white);
+    background-color: var(--off-white);
+    color: var(--text-dark);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     padding: 1.5rem;
 }
-.history-card-header { border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 1rem; margin-bottom: 1rem; }
+.history-card-header { border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem; }
 .history-card-header h3 { margin: 0; }
 .history-card-header p, .history-card-header span { margin: 0; opacity: 0.8; font-size: 0.9rem; }
 .subject-item {
@@ -917,7 +922,7 @@ small { color: var(--text-light); }
     background: #FFD6F5; /* Warna pink solid */
 }
 .bg-pink-gradient {
-     background: linear-gradient(to bottom, var(--white), var(--light-pink));
+    background-color: var(--background-main);
 }
 .main-content-flow {
     padding: 2rem;
@@ -983,7 +988,7 @@ small { color: var(--text-light); }
     max-width: 800px;
     height: auto;
     margin: 2rem auto;
-    background-color: var(--white);
+    background-color: var(--off-white);
     border-radius: 24px;
     padding: 2.5rem;
     box-shadow: 0 15px 40px rgba(0,0,0,0.1);
@@ -1026,8 +1031,8 @@ small { color: var(--text-light); }
 }
 
 .event-detail-footer {
-    background: var(--light-pink);
-    border-top: 1px solid var(--hot-pink);
+    background: var(--background-main);
+    border-top: 1px solid var(--light-blue);
     position: fixed;
     bottom: 0;
     left: 0;
@@ -1118,7 +1123,7 @@ small { color: var(--text-light); }
 .registration-container {
     max-width: 700px;
     margin: 2rem auto;
-    background-color: var(--white);
+    background-color: var(--off-white);
     border-radius: 24px;
     padding: 2.5rem;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
@@ -1226,7 +1231,7 @@ small { color: var(--text-light); }
 .checkout-container {
     max-width: 700px;
     margin: 2rem auto;
-    background-color: var(--white);
+    background-color: var(--off-white);
     border-radius: 24px;
     padding: 2.5rem;
     box-shadow: 0 15px 40px rgba(0,0,0,0.1);
@@ -1334,7 +1339,7 @@ small { color: var(--text-light); }
 /* Container Putih untuk Setiap Bagian */
 .news-section,
 .articles-section {
-    background-color: var(--white);
+    background-color: var(--off-white);
     padding: 1.5rem 2rem;
     border-radius: 20px;
     margin-bottom: 2rem;

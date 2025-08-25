@@ -32,29 +32,26 @@ function createTransactionRow(trx) {
     const isFree = trx.transaction_code && trx.transaction_code.startsWith('FREE-');
 
     if (isFree) {
-        // Logika status untuk pendaftaran gratis (sudah benar)
+        // Logika status untuk pendaftaran gratis
         if (trx.payment_status === 'Menunggu Validasi') {
-            statusHTML = `<div class="status-validating"><span>Menunggu Validasi</span><div class="progress-bar"><div class="progress" style="width: 50%;"></div></div></div>`;
+            statusHTML = `<div class="status-validating"><span>Menunggu Validasi</span></div>`;
         } else if (trx.payment_status === 'paid') {
-            statusHTML = `<div class="status-paid"><span>Terverifikasi</span><div class="progress-bar"><div class="progress" style="width: 100%;"></div></div></div>`;
+            statusHTML = `<div class="status-paid"><span>Terverifikasi</span></div>`;
         } else { // rejected
-             statusHTML = `<div class="status-no-paid"><span>Ditolak</span><div class="progress-bar"><div class="progress" style="width: 10%;"></div></div></div>`;
+             statusHTML = `<div class="status-no-paid"><span>Ditolak</span></div>`;
         }
-        // Tambahkan kelas 'btn-disabled-custom'
         buttonHTML = `<button class="btn-upload-bukti btn-disabled-custom" disabled>Pendaftaran Gratis</button>`;
 
     } else {
-        // Logika untuk pendaftaran berbayar (sudah benar)
+        // Logika untuk pendaftaran berbayar
         if (trx.payment_status === 'paid') {
-            statusHTML = `<div class="status-paid"><span>Paid</span><div class="progress-bar"><div class="progress" style="width: 100%;"></div></div></div>`;
-            // Tambahkan kelas 'btn-disabled-custom'
+            statusHTML = `<div class="status-paid"><span>Paid</span></div>`;
             buttonHTML = `<button class="btn-upload-bukti btn-disabled-custom" disabled>Sudah Dibayar</button>`;
         } else if (trx.payment_status === 'Menunggu Validasi') {
-            statusHTML = `<div class="status-validating"><span>Menunggu Validasi</span><div class="progress-bar"><div class="progress" style="width: 50%;"></div></div></div>`;
-            // Tambahkan kelas 'btn-disabled-custom'
+            statusHTML = `<div class="status-validating"><span>Menunggu Validasi</span></div>`;
             buttonHTML = `<button class="btn-upload-bukti btn-disabled-custom" disabled>Menunggu Validasi</button>`;
         } else { // 'pending_payment'
-            statusHTML = `<div class="status-no-paid"><span>Belum Dibayar</span><div class="progress-bar"><div class="progress" style="width: 10%;"></div></div><small>Segera bayar</small></div>`;
+            statusHTML = `<div class="status-no-paid"><span>Belum Dibayar</span></div>`;
             buttonHTML = `<button class="btn-upload-bukti" data-trx-id="${trx.id}">Upload Bukti</button>`;
         }
     }
